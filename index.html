@@ -80,6 +80,7 @@
         a {
             text-decoration: none;
             color: inherit;
+            cursor: pointer;
         }
 
         .container {
@@ -281,77 +282,55 @@
             padding: 30px;
             text-align: center;
             transition: var(--transition);
+            cursor: pointer;
         }
 
         .skill-item:hover {
             transform: translateY(-10px);
             background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
 
         .skill-icon {
             font-size: 3rem;
             color: var(--accent);
             margin-bottom: 20px;
+            transition: var(--transition);
         }
 
-        /* Graphic Design Gallery Section */
-        .design-gallery {
-            background-color: var(--primary);
-            padding: 80px 0;
+        .skill-item:hover .skill-icon {
+            transform: scale(1.2);
         }
 
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
-        }
-
-        .gallery-item {
-            border-radius: var(--border-radius);
+        .skill-details {
+            max-height: 0;
             overflow: hidden;
+            transition: max-height 0.5s ease;
+            margin-top: 0;
+            text-align: left;
+        }
+
+        .skill-item.active .skill-details {
+            max-height: 200px;
+            margin-top: 15px;
+        }
+
+        .skill-details ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .skill-details li {
+            margin-bottom: 8px;
+            padding-left: 20px;
             position: relative;
-            height: 280px;
-            background-color: var(--secondary);
-            cursor: pointer;
-            transition: var(--transition);
         }
 
-        .gallery-item:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow);
-        }
-
-        .gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .gallery-item:hover .gallery-img {
-            transform: scale(1.05);
-        }
-
-        .gallery-overlay {
+        .skill-details li:before {
+            content: "▸";
+            color: var(--accent);
             position: absolute;
-            top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(22, 33, 62, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: var(--transition);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
         }
 
         /* Portfolio Section */
@@ -396,12 +375,6 @@
             height: 300px;
             background-color: var(--secondary);
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .portfolio-item:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow);
         }
 
         .portfolio-img {
@@ -417,7 +390,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(22, 33, 62, 0.9);
+            background: rgba(22, 33, 62, 0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -434,6 +407,72 @@
 
         .portfolio-item:hover .portfolio-img {
             transform: scale(1.05);
+        }
+
+        /* Project Modal */
+        .project-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--secondary);
+            margin: 50px auto;
+            max-width: 900px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+            animation: modalFade 0.3s ease;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            background: var(--accent);
+        }
+
+        .modal-body {
+            padding: 40px;
+        }
+
+        .modal-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .modal-img {
+            width: 100%;
+            border-radius: var(--border-radius);
         }
 
         /* Contact Section */
@@ -457,6 +496,15 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .contact-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateX(10px);
         }
 
         .contact-icon {
@@ -469,25 +517,13 @@
             justify-content: center;
             font-size: 1.5rem;
             color: var(--accent);
+            transition: var(--transition);
         }
 
-        .contact-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .contact-btn {
-            padding: 10px 20px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            border-radius: var(--border-radius);
-            cursor: not-allowed;
-            opacity: 0.6;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
+        .contact-item:hover .contact-icon {
+            background-color: var(--accent);
+            color: white;
+            transform: scale(1.1);
         }
 
         .contact-form {
@@ -536,7 +572,7 @@
 
         .social-links {
             display: flex;
-            gap: 15px;
+            gap: 20px;
         }
 
         .social-link {
@@ -548,6 +584,8 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
         }
 
         .social-link:hover {
@@ -614,7 +652,7 @@
                 align-items: flex-start;
             }
             
-            .portfolio-grid, .gallery-grid {
+            .portfolio-grid {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             }
             
@@ -638,8 +676,12 @@
                 padding: 70px 0;
             }
             
-            .portfolio-grid, .gallery-grid {
+            .portfolio-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .modal-body {
+                padding: 20px;
             }
         }
     </style>
@@ -658,7 +700,6 @@
                 <ul class="nav-links" id="navLinks">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">About</a></li>
-                    <li><a href="#design-gallery">Designs</a></li>
                     <li><a href="#skills">Skills</a></li>
                     <li><a href="#portfolio">Portfolio</a></li>
                     <li><a href="#contact">Contact</a></li>
@@ -699,46 +740,6 @@
         </div>
     </section>
 
-    <!-- Graphic Design Gallery Section (NEW) -->
-    <section class="design-gallery" id="design-gallery">
-        <div class="container">
-            <div class="section-title">
-                <h2>Graphic Design Gallery</h2>
-            </div>
-            <div class="gallery-grid">
-                <!-- All 4 images are clickable -->
-                <div class="gallery-item" onclick="viewProject('brand-identity')">
-                    <img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Brand Identity Project" class="gallery-img">
-                    <div class="gallery-overlay">
-                        <h3>NovaTech Brand Identity</h3>
-                        <p>Complete brand identity including logo, color palette, and brand guidelines</p>
-                    </div>
-                </div>
-                <div class="gallery-item" onclick="viewProject('packaging-design')">
-                    <img src="https://images.unsplash.com/photo-1586232702178-f044c5f4d4b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product Packaging" class="gallery-img">
-                    <div class="gallery-overlay">
-                        <h3>Organic Skincare Packaging</h3>
-                        <p>Eco-friendly packaging design for a natural skincare line</p>
-                    </div>
-                </div>
-                <div class="gallery-item" onclick="viewProject('poster-design')">
-                    <img src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Poster Design" class="gallery-img">
-                    <div class="gallery-overlay">
-                        <h3>Music Festival Poster</h3>
-                        <p>Typography-focused poster design for music festival</p>
-                    </div>
-                </div>
-                <div class="gallery-item" onclick="viewProject('ui-design')">
-                    <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="UI Design" class="gallery-img">
-                    <div class="gallery-overlay">
-                        <h3>Mobile App Interface</h3>
-                        <p>Modern UI design for fintech mobile application</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Skills Section -->
     <section class="skills" id="skills">
         <div class="container">
@@ -746,33 +747,69 @@
                 <h2>My Expertise</h2>
             </div>
             <div class="skills-grid">
-                <div class="skill-item">
+                <div class="skill-item" onclick="toggleSkillDetails(0)">
                     <div class="skill-icon">
                         <i class="fas fa-palette"></i>
                     </div>
                     <h3>Graphic Design</h3>
                     <p>Logo design, branding, print materials, digital graphics, social media assets, and illustration.</p>
+                    <div class="skill-details">
+                        <ul>
+                            <li>Logo & Brand Identity Design</li>
+                            <li>Print Design (Brochures, Flyers)</li>
+                            <li>Social Media Graphics</li>
+                            <li>UI/UX Design</li>
+                            <li>Adobe Creative Suite Expert</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="skill-item">
+                <div class="skill-item" onclick="toggleSkillDetails(1)">
                     <div class="skill-icon">
                         <i class="fas fa-video"></i>
                     </div>
                     <h3>Video Editing</h3>
                     <p>Promotional videos, social media content, corporate videos, interviews, and event highlights.</p>
+                    <div class="skill-details">
+                        <ul>
+                            <li>Promotional & Commercial Videos</li>
+                            <li>Social Media Video Content</li>
+                            <li>Corporate & Training Videos</li>
+                            <li>Color Grading & Correction</li>
+                            <li>Adobe Premiere Pro & After Effects</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="skill-item">
+                <div class="skill-item" onclick="toggleSkillDetails(2)">
                     <div class="skill-icon">
                         <i class="fas fa-brush"></i>
                     </div>
                     <h3>Visual Identity</h3>
                     <p>Developing cohesive visual systems that communicate brand values and resonate with target audiences.</p>
+                    <div class="skill-details">
+                        <ul>
+                            <li>Brand Strategy Development</li>
+                            <li>Visual Identity Systems</li>
+                            <li>Brand Guidelines Creation</li>
+                            <li>Market Research & Analysis</li>
+                            <li>Competitor Analysis</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="skill-item">
+                <div class="skill-item" onclick="toggleSkillDetails(3)">
                     <div class="skill-icon">
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <h3>Post-Production</h3>
-                    <p>Color grading, sound design, visual effects, and final delivery.</p>
+                    <p>Color grading, sound design, visual effects, and final delivery for video projects.</p>
+                    <div class="skill-details">
+                        <ul>
+                            <li>Color Correction & Grading</li>
+                            <li>Sound Design & Audio Mixing</li>
+                            <li>Visual Effects (VFX)</li>
+                            <li>Motion Graphics</li>
+                            <li>Final Encoding & Delivery</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -791,67 +828,98 @@
                 <button class="filter-btn" data-filter="branding">Branding</button>
             </div>
             <div class="portfolio-grid">
-                <!-- ALL PORTFOLIO ITEMS ARE NOW CLICKABLE -->
-                <div class="portfolio-item" data-category="design" onclick="viewProject('novatech')">
+                <!-- Project 1 - Clickable -->
+                <div class="portfolio-item" data-category="design" onclick="openProjectModal(0)">
                     <img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Brand Identity Project" class="portfolio-img">
                     <div class="portfolio-overlay">
                         <h3>NovaTech Brand Identity</h3>
                         <p>Complete brand identity including logo, color palette, and brand guidelines</p>
+                        <button class="btn btn-outline">View Project Details</button>
                     </div>
                 </div>
-                <div class="portfolio-item" data-category="video" onclick="viewProject('corporate-video')">
+                
+                <!-- Project 2 - Clickable -->
+                <div class="portfolio-item" data-category="video" onclick="openProjectModal(1)">
                     <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Corporate Video" class="portfolio-img">
                     <div class="portfolio-overlay">
                         <h3>Corporate Overview Video</h3>
                         <p>5-minute corporate video showcasing company culture and services</p>
+                        <button class="btn btn-outline">View Project Details</button>
                     </div>
                 </div>
-                <div class="portfolio-item" data-category="branding" onclick="viewProject('brew-co')">
+                
+                <!-- Project 3 - Clickable -->
+                <div class="portfolio-item" data-category="branding" onclick="openProjectModal(2)">
                     <img src="https://images.unsplash.com/photo-1567446537710-0e9b8d4d8c4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Coffee Shop Branding" class="portfolio-img">
                     <div class="portfolio-overlay">
                         <h3>Brew & Co. Branding</h3>
                         <p>Complete branding package for a specialty coffee shop</p>
+                        <button class="btn btn-outline">View Project Details</button>
                     </div>
                 </div>
-                <div class="portfolio-item" data-category="design" onclick="viewProject('eco-packaging')">
+                
+                <!-- Project 4 - Clickable -->
+                <div class="portfolio-item" data-category="design" onclick="openProjectModal(3)">
                     <img src="https://images.unsplash.com/photo-1586232702178-f044c5f4d4b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Product Packaging" class="portfolio-img">
                     <div class="portfolio-overlay">
                         <h3>Organic Skincare Packaging</h3>
                         <p>Eco-friendly packaging design for a natural skincare line</p>
+                        <button class="btn btn-outline">View Project Details</button>
                     </div>
                 </div>
-                <div class="portfolio-item" data-category="video" onclick="viewProject('social-campaign')">
+                
+                <!-- Project 5 - Clickable -->
+                <div class="portfolio-item" data-category="video" onclick="openProjectModal(4)">
                     <img src="https://images.unsplash.com/photo-1552168324-d612d77725e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Social Media Campaign" class="portfolio-img">
                     <div class="portfolio-overlay">
                         <h3>Social Media Video Campaign</h3>
                         <p>Series of short-form videos for a social media marketing campaign</p>
+                        <button class="btn btn-outline">View Project Details</button>
                     </div>
                 </div>
-                <div class="portfolio-item" data-category="branding" onclick="viewProject('fine-dining')">
+                
+                <!-- Project 6 - Clickable -->
+                <div class="portfolio-item" data-category="branding" onclick="openProjectModal(5)">
                     <img src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Restaurant Menu Design" class="portfolio-img">
                     <div class="portfolio-overlay">
                         <h3>Fine Dining Menu Design</h3>
                         <p>Elegant menu design for a high-end restaurant</p>
-                    </div>
-                </div>
-                <!-- Additional portfolio items to make all images clickable -->
-                <div class="portfolio-item" data-category="video" onclick="viewProject('documentary')">
-                    <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Documentary" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <h3>Documentary Series</h3>
-                        <p>6-part documentary editing for streaming platform</p>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-category="design" onclick="viewProject('magazine-design')">
-                    <img src="https://images.unsplash.com/photo-1544716278-e513176f20b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Magazine Design" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <h3>Magazine Layout Design</h3>
-                        <p>Complete layout design for fashion magazine</p>
+                        <button class="btn btn-outline">View Project Details</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Project Modal -->
+    <div id="projectModal" class="project-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProjectModal()">&times;</span>
+            <div class="modal-body">
+                <h2 id="modalTitle">Project Title</h2>
+                <div id="modalCategory" class="modal-category"></div>
+                <p id="modalDescription">Project description will appear here.</p>
+                
+                <div class="modal-images" id="modalImages">
+                    <!-- Images will be added here dynamically -->
+                </div>
+                
+                <h3>Project Details</h3>
+                <div id="modalDetails">
+                    <!-- Details will be added here dynamically -->
+                </div>
+                
+                <h3>Technologies Used</h3>
+                <div id="modalTechnologies">
+                    <!-- Technologies will be added here dynamically -->
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn" onclick="closeProjectModal()">Close Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Contact Section -->
     <section class="contact" id="contact">
@@ -864,58 +932,54 @@
                     <h3>Let's Create Something Amazing Together</h3>
                     <p>Have a project in mind? I'd love to hear about it. Send me a message and let's discuss how we can work together.</p>
                     
-                    <div class="contact-item">
+                    <!-- Clickable Contact Items -->
+                    <div class="contact-item" onclick="openEmail()">
                         <div class="contact-icon">
                             <i class="fas fa-envelope"></i>
                         </div>
                         <div>
                             <h4>Email</h4>
                             <p>hello@alexmorgan.design</p>
+                            <small>Click to send email</small>
                         </div>
                     </div>
                     
-                    <div class="contact-item">
+                    <div class="contact-item" onclick="openPhone()">
                         <div class="contact-icon">
                             <i class="fas fa-phone"></i>
                         </div>
                         <div>
                             <h4>Phone</h4>
                             <p>+1 (555) 123-4567</p>
+                            <small>Click to call</small>
                         </div>
                     </div>
                     
-                    <div class="contact-item">
+                    <div class="contact-item" onclick="openLocation()">
                         <div class="contact-icon">
                             <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <div>
                             <h4>Location</h4>
                             <p>Brooklyn, New York</p>
+                            <small>Click to view on map</small>
                         </div>
-                    </div>
-
-                    <!-- UNCLICKABLE BUTTONS -->
-                    <div class="contact-buttons">
-                        <button class="contact-btn">Request Quote</button>
-                        <button class="contact-btn">Download Portfolio</button>
-                        <button class="contact-btn">Schedule Call</button>
-                        <button class="contact-btn">View Pricing</button>
                     </div>
                 </div>
                 
                 <div class="contact-form">
                     <form id="contactForm">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Your Name" required>
+                            <input type="text" class="form-control" placeholder="Your Name" required id="name">
                         </div>
                         <div class="form-group">
-                            <input type="email" class="form-control" placeholder="Your Email" required>
+                            <input type="email" class="form-control" placeholder="Your Email" required id="email">
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Subject" required>
+                            <input type="text" class="form-control" placeholder="Subject" required id="subject">
                         </div>
                         <div class="form-group">
-                            <textarea class="form-control" placeholder="Your Message" required></textarea>
+                            <textarea class="form-control" placeholder="Your Message" required id="message"></textarea>
                         </div>
                         <button type="submit" class="btn">Send Message</button>
                     </form>
@@ -933,30 +997,88 @@
                     <p>Visual Designer & Editor</p>
                 </div>
                 
-                <!-- UPDATED SOCIAL MEDIA LINKS -->
                 <div class="social-links">
-                    <a href="https://pinterest.com" target="_blank" class="social-link">
-                        <i class="fab fa-pinterest"></i>
+                    <!-- Clickable Social Links -->
+                    <a href="https://behance.net" target="_blank" class="social-link">
+                        <i class="fab fa-behance"></i>
                     </a>
-                    <a href="https://discord.com" target="_blank" class="social-link">
-                        <i class="fab fa-discord"></i>
-                    </a>
-                    <a href="https://threads.net" target="_blank" class="social-link">
-                        <i class="fa-brands fa-threads"></i>
+                    <a href="https://dribbble.com" target="_blank" class="social-link">
+                        <i class="fab fa-dribbble"></i>
                     </a>
                     <a href="https://instagram.com" target="_blank" class="social-link">
                         <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" class="social-link">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://vimeo.com" target="_blank" class="social-link">
+                        <i class="fab fa-vimeo-v"></i>
                     </a>
                 </div>
             </div>
             
             <div class="copyright">
-                <p>&copy; 2023 Alex Morgan. All rights reserved.</p>
+                <p>&copy; 2023 Alex Morgan. All rights reserved. | <a href="#privacy" style="color: var(--accent);">Privacy Policy</a></p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Project Data
+        const projects = [
+            {
+                title: "NovaTech Brand Identity",
+                category: "Graphic Design",
+                description: "Complete brand identity system for a tech startup, including logo design, color palette, typography, and comprehensive brand guidelines. The project focused on creating a modern, trustworthy image for the innovative tech company.",
+                images: [
+                    "https://images.unsplash.com/photo-1634942537034-2531766767d1",
+                    "https://images.unsplash.com/photo-1545235617-9465d2a55698",
+                    "https://images.unsplash.com/photo-1561070791-2526d30994b5"
+                ],
+                details: [
+                    "Client: NovaTech Solutions",
+                    "Timeline: 6 weeks",
+                    "Deliverables: Logo, Brand Guidelines, Stationery Design",
+                    "Industry: Technology"
+                ],
+                technologies: ["Adobe Illustrator", "Adobe Photoshop", "Figma", "InDesign"]
+            },
+            {
+                title: "Corporate Overview Video",
+                category: "Video Editing",
+                description: "A comprehensive 5-minute corporate video showcasing company culture, services, and client testimonials. The video was used for investor presentations, website homepage, and trade shows.",
+                images: [
+                    "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1",
+                    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+                    "https://images.unsplash.com/photo-1559136555-9303baea8ebd"
+                ],
+                details: [
+                    "Client: GlobalCorp Inc.",
+                    "Timeline: 3 weeks",
+                    "Length: 5 minutes",
+                    "Usage: Marketing, Presentations"
+                ],
+                technologies: ["Adobe Premiere Pro", "After Effects", "DaVinci Resolve", "Audition"]
+            },
+            {
+                title: "Brew & Co. Branding",
+                category: "Branding",
+                description: "Complete branding package for a specialty coffee shop chain, including logo, packaging, merchandise, and interior signage. The design focused on creating a warm, artisanal feel.",
+                images: [
+                    "https://images.unsplash.com/photo-1567446537710-0e9b8d4d8c4d",
+                    "https://images.unsplash.com/photo-1559056199-641a0ac8b55e",
+                    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085"
+                ],
+                details: [
+                    "Client: Brew & Co. Coffee",
+                    "Timeline: 8 weeks",
+                    "Locations: 5 stores",
+                    "Industry: Food & Beverage"
+                ],
+                technologies: ["Adobe Illustrator", "InDesign", "Procreate", "Photoshop"]
+            }
+        ];
+
         // Mobile Menu Toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
@@ -1021,17 +1143,108 @@
         const contactForm = document.getElementById('contactForm');
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            alert('Thank you for your message! I will get back to you soon.');
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            
+            // Show success message
+            alert(`Thank you ${name}! Your message has been sent. I'll get back to you soon at ${email}.`);
             contactForm.reset();
         });
         
-        // Function to handle project clicks
-        function viewProject(projectId) {
-            alert(`Opening project: ${projectId.replace('-', ' ').toUpperCase()}\n\nThis would open a detailed case study page with more information about the project.`);
+        // Toggle Skill Details
+        function toggleSkillDetails(index) {
+            const skillItems = document.querySelectorAll('.skill-item');
+            const clickedItem = skillItems[index];
             
-            // In a real implementation, you would redirect to a project page:
-            // window.location.href = `/projects/${projectId}`;
+            // Close all other skill items
+            skillItems.forEach(item => {
+                if (item !== clickedItem && item.classList.contains('active')) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Toggle clicked item
+            clickedItem.classList.toggle('active');
         }
+        
+        // Open Project Modal
+        function openProjectModal(projectIndex) {
+            const modal = document.getElementById('projectModal');
+            const project = projects[projectIndex];
+            
+            // Set modal content
+            document.getElementById('modalTitle').textContent = project.title;
+            document.getElementById('modalCategory').textContent = project.category;
+            document.getElementById('modalDescription').textContent = project.description;
+            
+            // Add images
+            const modalImages = document.getElementById('modalImages');
+            modalImages.innerHTML = '';
+            project.images.forEach(imgUrl => {
+                const img = document.createElement('img');
+                img.src = imgUrl + '?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                img.alt = project.title;
+                img.className = 'modal-img';
+                modalImages.appendChild(img);
+            });
+            
+            // Add details
+            const modalDetails = document.getElementById('modalDetails');
+            modalDetails.innerHTML = '';
+            project.details.forEach(detail => {
+                const p = document.createElement('p');
+                p.textContent = detail;
+                modalDetails.appendChild(p);
+            });
+            
+            // Add technologies
+            const modalTech = document.getElementById('modalTechnologies');
+            modalTech.innerHTML = '';
+            project.technologies.forEach(tech => {
+                const span = document.createElement('span');
+                span.textContent = tech;
+                span.style = 'display: inline-block; background: rgba(255, 77, 90, 0.1); color: var(--accent); padding: 5px 15px; margin: 5px; border-radius: 20px;';
+                modalTech.appendChild(span);
+            });
+            
+            // Show modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Close Project Modal
+        function closeProjectModal() {
+            const modal = document.getElementById('projectModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Contact Item Actions
+        function openEmail() {
+            window.location.href = 'mailto:hello@alexmorgan.design?subject=Project Inquiry&body=Hello Alex, I would like to discuss a project with you.';
+        }
+        
+        function openPhone() {
+            // For mobile devices, this will trigger the phone app
+            window.location.href = 'tel:+15551234567';
+        }
+        
+        function openLocation() {
+            // Open Google Maps
+            window.open('https://maps.google.com/?q=Brooklyn,New+York', '_blank');
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('projectModal');
+            if (e.target === modal) {
+                closeProjectModal();
+            }
+        });
         
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
