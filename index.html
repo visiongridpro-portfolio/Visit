@@ -1,504 +1,761 @@
-const pptxgen = require("pptxgenjs");
-const React = require("react");
-const ReactDOMServer = require("react-dom/server");
-const sharp = require("sharp");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Editing Services</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-// Icon imports
-const { FaYoutube, FaFilm, FaBuilding, FaStar, FaCheck, FaClock, FaEnvelope, FaPhone } = require("react-icons/fa");
-const { MdMovieEdit, MdSpeed, MdHighQuality, MdPeople } = require("react-icons/md");
-
-async function iconToBase64Png(IconComponent, color, size = 256) {
-  const svg = ReactDOMServer.renderToStaticMarkup(
-    React.createElement(IconComponent, { color, size: String(size) })
-  );
-  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
-  return "image/png;base64," + pngBuffer.toString("base64");
-}
-
-async function main() {
-  const pres = new pptxgen();
-  pres.layout = "LAYOUT_16x9";
-  pres.title = "Video Editing Services";
-
-  // Color palette — clean & professional
-  const C = {
-    navy:    "1B2B4B",
-    blue:    "2563EB",
-    lightBlue: "DBEAFE",
-    slate:   "64748B",
-    offWhite:"F8FAFC",
-    white:   "FFFFFF",
-    dark:    "0F172A",
-    accent:  "3B82F6",
-    muted:   "94A3B8",
-    cardBg:  "F1F5F9",
-  };
-
-  const makeShadow = () => ({ type: "outer", blur: 8, offset: 3, angle: 135, color: "000000", opacity: 0.08 });
-
-  // ── SLIDE 1: Title ────────────────────────────────────────────────────
-  {
-    const slide = pres.addSlide();
-    slide.background = { color: C.white };
-
-    // Left accent panel
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 0, y: 0, w: 3.8, h: 5.625,
-      fill: { color: C.navy }
-    });
-
-    // Decorative blue rectangle inside panel
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 0, y: 3.8, w: 3.8, h: 0.08,
-      fill: { color: C.accent }
-    });
-
-    // Film-strip decorative lines
-    for (let i = 0; i < 6; i++) {
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: 0.25, y: 0.5 + i * 0.55, w: 0.35, h: 0.38,
-        fill: { color: "FFFFFF", transparency: 85 }
-      });
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: 3.2, y: 0.5 + i * 0.55, w: 0.35, h: 0.38,
-        fill: { color: "FFFFFF", transparency: 85 }
-      });
+    :root {
+      --navy:       #1B2B4B;
+      --blue:       #2563EB;
+      --light-blue: #DBEAFE;
+      --accent:     #3B82F6;
+      --slate:      #64748B;
+      --off-white:  #F8FAFC;
+      --white:      #FFFFFF;
+      --dark:       #0F172A;
+      --muted:      #94A3B8;
+      --card-bg:    #F1F5F9;
     }
 
-    // Left panel text
-    slide.addText("VIDEO\nEDITING\nSERVICES", {
-      x: 0.5, y: 1.2, w: 2.8, h: 2.2,
-      fontSize: 28, bold: true, color: C.white,
-      fontFace: "Trebuchet MS", align: "left",
-      lineSpacingMultiple: 1.2
-    });
-    slide.addText("Professional. Creative. Delivered.", {
-      x: 0.5, y: 3.55, w: 2.8, h: 0.45,
-      fontSize: 11, color: "93C5FD", fontFace: "Calibri", align: "left",
-      italic: true
-    });
+    html { scroll-behavior: smooth; }
 
-    // Right side content
-    slide.addText("Crafting stories that", {
-      x: 4.3, y: 1.1, w: 5.3, h: 0.55,
-      fontSize: 30, bold: true, color: C.dark, fontFace: "Trebuchet MS"
-    });
-    slide.addText("captivate & convert.", {
-      x: 4.3, y: 1.65, w: 5.3, h: 0.6,
-      fontSize: 30, bold: true, color: C.blue, fontFace: "Trebuchet MS"
-    });
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--off-white);
+      color: var(--dark);
+      overflow-x: hidden;
+    }
 
-    slide.addText("From YouTube content to corporate promos —\nwe bring your vision to life with precision and style.", {
-      x: 4.3, y: 2.5, w: 5.3, h: 1.0,
-      fontSize: 13.5, color: C.slate, fontFace: "Calibri", lineSpacingMultiple: 1.4
-    });
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 3rem;
+      background: rgba(27,43,75,0.96);
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.5rem;
+      letter-spacing: 3px;
+      color: var(--white);
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
 
-    // Three service chips
-    const chips = ["YouTube & Social", "Corporate Video"];
-    chips.forEach((label, i) => {
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: 4.3 + i * 1.82, y: 3.75, w: 1.65, h: 0.42,
-        fill: { color: C.lightBlue }, line: { color: C.accent, width: 1 }
-      });
-      slide.addText(label, {
-        x: 4.3 + i * 1.82, y: 3.75, w: 1.65, h: 0.42,
-        fontSize: 9.5, color: C.blue, bold: true, align: "center", valign: "middle",
-        fontFace: "Calibri", margin: 0
-      });
-    });
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      padding-top: 72px;
+    }
+    .hero-left {
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 5rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-left::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--accent);
+    }
+    .filmstrip {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      opacity: .12;
+    }
+    .filmstrip.left { left: 14px; }
+    .filmstrip.right { right: 14px; }
+    .filmstrip span {
+      display: block;
+      width: 26px; height: 20px;
+      border: 2px solid white;
+      border-radius: 2px;
+    }
+    .hero-eyebrow {
+      font-size: .75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #93C5FD;
+      margin-bottom: 1.2rem;
+      font-weight: 500;
+    }
+    .hero-title-left {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+      line-height: .95;
+      color: var(--white);
+      letter-spacing: 2px;
+    }
+    .hero-tagline {
+      margin-top: 1.5rem;
+      font-size: .9rem;
+      color: #93C5FD;
+      font-style: italic;
+      font-weight: 300;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: 2.5rem;
+    }
+    .chip {
+      padding: .35rem 1rem;
+      border: 1.5px solid var(--accent);
+      border-radius: 2px;
+      font-size: .8rem;
+      font-weight: 600;
+      color: #93C5FD;
+      letter-spacing: .5px;
+    }
 
-    // Bottom tagline
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 4.3, y: 4.6, w: 5.3, h: 0.02,
-      fill: { color: C.muted }
-    });
-    slide.addText("Elevating brands through compelling visual storytelling", {
-      x: 4.3, y: 4.75, w: 5.3, h: 0.4,
-      fontSize: 11, color: C.muted, italic: true, fontFace: "Calibri"
-    });
-  }
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 5rem 4rem;
+      background: var(--white);
+    }
+    .hero-headline {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(2.8rem, 5vw, 4.8rem);
+      line-height: 1;
+      letter-spacing: 1px;
+      color: var(--dark);
+    }
+    .hero-headline span { color: var(--blue); }
+    .hero-body {
+      margin-top: 1.8rem;
+      font-size: 1.05rem;
+      color: var(--slate);
+      line-height: 1.75;
+      max-width: 520px;
+    }
+    .hero-divider {
+      width: 80px; height: 3px;
+      background: var(--muted);
+      margin: 2rem 0;
+    }
+    .hero-sub {
+      font-size: .9rem;
+      color: var(--muted);
+      font-style: italic;
+    }
 
-  // ── SLIDE 2: About / Value Prop ───────────────────────────────────────
-  {
-    const slide = pres.addSlide();
-    slide.background = { color: C.offWhite };
+    /* ── SECTION WRAPPER ── */
+    section { padding: 6rem 0; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; }
 
-    // Header band
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 0, y: 0, w: 10, h: 1.1,
-      fill: { color: C.navy }
-    });
-    slide.addText("ABOUT US", {
-      x: 0.6, y: 0, w: 8.8, h: 1.1,
-      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
-      valign: "middle", charSpacing: 4
-    });
+    .section-header {
+      background: var(--navy);
+      padding: .9rem 2.5rem;
+      margin-bottom: 3.5rem;
+    }
+    .section-header h2 {
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
 
-    // Main headline
-    slide.addText("We don't just edit video —\nwe shape narratives.", {
-      x: 0.6, y: 1.3, w: 4.5, h: 1.5,
-      fontSize: 22, bold: true, color: C.dark, fontFace: "Trebuchet MS",
-      lineSpacingMultiple: 1.3
-    });
+    /* ── ABOUT ── */
+    #about { background: var(--off-white); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .about-headline {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      line-height: 1;
+      letter-spacing: 1px;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+    .about-body {
+      font-size: 1rem;
+      color: var(--slate);
+      line-height: 1.8;
+    }
+    .quals {
+      list-style: none;
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+    .quals li {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: .95rem;
+      color: var(--dark);
+    }
+    .quals li::before {
+      content: '';
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
 
-    slide.addText("Our team brings deep technical expertise and a creative eye to every project. Whether you need a polished brand promo, a scroll-stopping social reel, or a cinematic short film — we deliver quality that speaks for itself.", {
-      x: 0.6, y: 2.9, w: 4.5, h: 1.5,
-      fontSize: 13, color: C.slate, fontFace: "Calibri", lineSpacingMultiple: 1.5
-    });
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--white);
+      border-top: 4px solid var(--accent);
+      padding: 1.5rem 1.2rem 1.2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+    .stat-number {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.6rem;
+      color: var(--blue);
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .8rem;
+      color: var(--slate);
+      margin-top: .4rem;
+      font-weight: 500;
+    }
 
-    // Stats cards
-    const stats = [
-      { num: "24+", label: "Projects Delivered" },
-      { num: "95%", label: "Client Satisfaction" },
-      { num: "2hr", label: "Avg. Turnaround" },
-    ];
-    stats.forEach((s, i) => {
-      const cx = 5.6 + i * 1.45;
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: 1.4, w: 1.25, h: 1.5,
-        fill: { color: C.white }, shadow: makeShadow()
-      });
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: 1.4, w: 1.25, h: 0.07,
-        fill: { color: C.accent }
-      });
-      slide.addText(s.num, {
-        x: cx, y: 1.55, w: 1.25, h: 0.7,
-        fontSize: 26, bold: true, color: C.blue, align: "center", fontFace: "Trebuchet MS", margin: 0
-      });
-      slide.addText(s.label, {
-        x: cx, y: 2.3, w: 1.25, h: 0.5,
-        fontSize: 9, color: C.slate, align: "center", fontFace: "Calibri", margin: 0
-      });
-    });
+    /* ── SERVICES ── */
+    #services { background: var(--white); }
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .service-card {
+      background: var(--card-bg);
+      border-top: 4px solid var(--accent);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,.05);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.1);
+    }
+    .service-icon {
+      width: 52px; height: 52px;
+      background: var(--navy);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.4rem;
+    }
+    .service-icon svg { width: 24px; height: 24px; fill: white; }
+    .service-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.5rem;
+      letter-spacing: 1.5px;
+      color: var(--dark);
+      margin-bottom: 1.2rem;
+    }
+    .service-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    .service-list li {
+      font-size: .92rem;
+      color: var(--slate);
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .service-list li::before {
+      content: '›';
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
 
-    // Qualities list
-    const quals = [
-      "Dedicated editor for every project",
-      "Revision rounds included",
-      "Source files & full licensing",
-      "Transparent pricing, no surprises",
-    ];
-    quals.forEach((q, i) => {
-      slide.addShape(pres.shapes.OVAL, {
-        x: 5.6, y: 3.25 + i * 0.48, w: 0.22, h: 0.22,
-        fill: { color: C.accent }
-      });
-      slide.addText(q, {
-        x: 5.95, y: 3.2 + i * 0.48, w: 3.8, h: 0.35,
-        fontSize: 12, color: C.dark, fontFace: "Calibri", valign: "middle", margin: 0
-      });
-    });
-  }
+    /* ── PROCESS ── */
+    #process { background: var(--off-white); }
+    .process-intro {
+      font-size: 1rem;
+      color: var(--slate);
+      margin-bottom: 3rem;
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      position: relative;
+    }
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      top: 38px;
+      left: calc(12.5% + 19px);
+      right: calc(12.5% + 19px);
+      height: 2px;
+      background: var(--accent);
+      opacity: .3;
+      z-index: 0;
+    }
+    .step-card {
+      background: var(--white);
+      padding: 2rem 1.5rem 1.8rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,.05);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      transition: transform .2s;
+    }
+    .step-card:hover { transform: translateY(-3px); }
+    .step-num {
+      width: 52px; height: 52px;
+      background: var(--navy);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.4rem;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.4rem;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+    .step-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      color: var(--dark);
+      margin-bottom: .7rem;
+    }
+    .step-desc {
+      font-size: .88rem;
+      color: var(--slate);
+      line-height: 1.65;
+    }
 
-  // ── SLIDE 3: Services ─────────────────────────────────────────────────
-  {
-    const slide = pres.addSlide();
-    slide.background = { color: C.white };
+    /* ── WHY CHOOSE ── */
+    #why { background: var(--white); }
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .why-card {
+      background: var(--card-bg);
+      padding: 2rem;
+      display: flex;
+      gap: 1.4rem;
+      align-items: flex-start;
+      box-shadow: 0 4px 18px rgba(0,0,0,.05);
+      transition: transform .2s;
+    }
+    .why-card:hover { transform: translateY(-3px); }
+    .why-icon {
+      width: 48px; height: 48px;
+      background: var(--navy);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .why-icon svg { width: 22px; height: 22px; fill: white; }
+    .why-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      color: var(--dark);
+      margin-bottom: .5rem;
+    }
+    .why-desc {
+      font-size: .9rem;
+      color: var(--slate);
+      line-height: 1.65;
+    }
 
-    // Pre-render icons
-    const [ytIcon, corpIcon] = await Promise.all([
-      iconToBase64Png(FaYoutube, "#FFFFFF", 256),
-      iconToBase64Png(FaBuilding, "#FFFFFF", 256),
-    ]);
+    /* ── CTA ── */
+    #cta {
+      background: var(--navy);
+      padding: 7rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #cta::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: rgba(59,130,246,.06);
+      pointer-events: none;
+    }
+    #cta::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .cta-accent {
+      width: 60px; height: 3px;
+      background: var(--accent);
+      margin: 0 auto 2.5rem;
+    }
+    .cta-headline {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      letter-spacing: 2px;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 1.4rem;
+    }
+    .cta-sub {
+      font-size: 1rem;
+      color: #93C5FD;
+      font-style: italic;
+      margin-bottom: 2.5rem;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--white);
+      padding: .9rem 2.5rem;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .cta-btn:hover { background: #1D4ED8; transform: translateY(-2px); }
+    .contact-row {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 2.5rem;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      color: #93C5FD;
+      font-size: .9rem;
+      text-decoration: none;
+    }
+    .contact-item svg { width: 16px; height: 16px; fill: #93C5FD; }
+    .cta-copy {
+      margin-top: 3rem;
+      font-size: .75rem;
+      color: #475569;
+      letter-spacing: 1px;
+    }
 
-    // Header
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 0, y: 0, w: 10, h: 1.1,
-      fill: { color: C.navy }
-    });
-    slide.addText("OUR SERVICES", {
-      x: 0.6, y: 0, w: 8.8, h: 1.1,
-      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
-      valign: "middle", charSpacing: 4
-    });
+    /* ── ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
 
-    // Three service cards
-    const services = [
-      {
-        icon: ytIcon,
-        title: "YouTube & Social Media",
-        bullets: [
-          "Reels, Shorts & TikTok edits",
-          "Color grading & motion graphics",
-          "Captions & subtitles",
-          "Thumbnail design",
-          "Fast turnaround for creators",
-        ],
-      },
-      {
-        icon: corpIcon,
-        title: "Corporate & Promo Video",
-        bullets: [
-          "Brand films & explainers",
-          "Product showcase videos",
-          "Interviews & testimonials",
-          "Trade show & event highlights",
-          "Branded lower-thirds & intros",
-        ],
-      },
-    ];
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      #hero { grid-template-columns: 1fr; }
+      .hero-left { padding: 4rem 2rem; min-height: 50vh; }
+      .hero-right { padding: 3rem 2rem; }
+      .about-grid, .services-grid, .why-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .process-steps::before { display: none; }
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
 
-    services.forEach((svc, i) => {
-      const cx = 0.6 + i * 4.8;
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">YourStudio</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#cta">Contact</a></li>
+  </ul>
+</nav>
 
-      // Card background
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: 1.25, w: 4.4, h: 4.0,
-        fill: { color: C.cardBg }, shadow: makeShadow()
-      });
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="filmstrip left"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="filmstrip right"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <p class="hero-eyebrow">Professional · Creative · Delivered</p>
+    <h1 class="hero-title-left">Video<br>Editing<br>Services</h1>
+    <p class="hero-tagline">Elevating brands through compelling visual storytelling</p>
+    <div class="chips">
+      <span class="chip">YouTube &amp; Social</span>
+      <span class="chip">Corporate Video</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <h2 class="hero-headline">Crafting stories that<br><span>captivate &amp; convert.</span></h2>
+    <p class="hero-body">From YouTube content to corporate promos — we bring your vision to life with precision and style.</p>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">Elevating brands through compelling visual storytelling</p>
+  </div>
+</section>
 
-      // Top accent bar
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: 1.25, w: 4.4, h: 0.07,
-        fill: { color: C.accent }
-      });
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header">
+    <h2>About Us</h2>
+  </div>
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <h3 class="about-headline reveal">We don't just edit video —<br>we shape narratives.</h3>
+        <p class="about-body reveal reveal-delay-1">Our team brings deep technical expertise and a creative eye to every project. Whether you need a polished brand promo or a scroll-stopping social reel — we deliver quality that speaks for itself.</p>
+        <ul class="quals">
+          <li class="reveal reveal-delay-1">Dedicated editor for every project</li>
+          <li class="reveal reveal-delay-2">Revision rounds included</li>
+          <li class="reveal reveal-delay-3">Source files &amp; full licensing</li>
+          <li class="reveal reveal-delay-4">Transparent pricing, no surprises</li>
+        </ul>
+      </div>
+      <div>
+        <div class="stats-grid">
+          <div class="stat-card reveal">
+            <div class="stat-number">24+</div>
+            <div class="stat-label">Projects Delivered</div>
+          </div>
+          <div class="stat-card reveal reveal-delay-1">
+            <div class="stat-number">95%</div>
+            <div class="stat-label">Client Satisfaction</div>
+          </div>
+          <div class="stat-card reveal reveal-delay-2">
+            <div class="stat-number">2hr</div>
+            <div class="stat-label">Avg. Turnaround</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-      // Icon circle
-      slide.addShape(pres.shapes.OVAL, {
-        x: cx + 1.82, y: 1.45, w: 0.75, h: 0.75,
-        fill: { color: C.navy }
-      });
-      slide.addImage({
-        data: svc.icon,
-        x: cx + 1.94, y: 1.57, w: 0.5, h: 0.5
-      });
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header">
+    <h2>Our Services</h2>
+  </div>
+  <div class="container">
+    <div class="services-grid">
 
-      // Title
-      slide.addText(svc.title, {
-        x: cx + 0.12, y: 2.32, w: 4.15, h: 0.55,
-        fontSize: 15, bold: true, color: C.dark, align: "center",
-        fontFace: "Trebuchet MS", lineSpacingMultiple: 1.2, margin: 0
-      });
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <!-- YouTube icon -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+        </div>
+        <h3 class="service-title">YouTube &amp; Social Media</h3>
+        <ul class="service-list">
+          <li>Reels, Shorts &amp; TikTok edits</li>
+          <li>Color grading &amp; motion graphics</li>
+          <li>Captions &amp; subtitles</li>
+          <li>Thumbnail design</li>
+          <li>Fast turnaround for creators</li>
+        </ul>
+      </div>
 
-      // Bullets
-      slide.addText(
-        svc.bullets.map((b, j) => ({
-          text: b,
-          options: { bullet: true, breakLine: j < svc.bullets.length - 1 }
-        })),
-        {
-          x: cx + 0.3, y: 2.98, w: 3.8, h: 2.1,
-          fontSize: 12, color: C.slate, fontFace: "Calibri",
-          paraSpaceAfter: 6, lineSpacingMultiple: 1.3
-        }
-      );
-    });
-  }
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-icon">
+          <!-- Building icon -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg>
+        </div>
+        <h3 class="service-title">Corporate &amp; Promo Video</h3>
+        <ul class="service-list">
+          <li>Brand films &amp; explainers</li>
+          <li>Product showcase videos</li>
+          <li>Interviews &amp; testimonials</li>
+          <li>Trade show &amp; event highlights</li>
+          <li>Branded lower-thirds &amp; intros</li>
+        </ul>
+      </div>
 
-  // ── SLIDE 4: Process ──────────────────────────────────────────────────
-  {
-    const slide = pres.addSlide();
-    slide.background = { color: C.offWhite };
+    </div>
+  </div>
+</section>
 
-    // Header
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 0, y: 0, w: 10, h: 1.1,
-      fill: { color: C.navy }
-    });
-    slide.addText("HOW IT WORKS", {
-      x: 0.6, y: 0, w: 8.8, h: 1.1,
-      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
-      valign: "middle", charSpacing: 4
-    });
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-header">
+    <h2>How It Works</h2>
+  </div>
+  <div class="container">
+    <p class="process-intro reveal">A simple, transparent process from brief to final delivery.</p>
+    <div class="process-steps">
+      <div class="step-card reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Discovery Call</div>
+        <p class="step-desc">We learn about your project goals, audience, and brand voice.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <div class="step-title">Brief &amp; Quote</div>
+        <p class="step-desc">Receive a clear scope, timeline, and fixed-price quote — no hidden fees.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <div class="step-title">Edit &amp; Review</div>
+        <p class="step-desc">We deliver a first cut. You give feedback. We refine until it's perfect.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <div class="step-title">Final Delivery</div>
+        <p class="step-desc">Receive export-ready files in all formats you need, with full licensing.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    slide.addText("A simple, transparent process from brief to final delivery.", {
-      x: 0.6, y: 1.25, w: 8.8, h: 0.45,
-      fontSize: 14, color: C.slate, fontFace: "Calibri"
-    });
+<!-- WHY CHOOSE US -->
+<section id="why">
+  <div class="section-header">
+    <h2>Why Choose Us</h2>
+  </div>
+  <div class="container">
+    <div class="why-grid">
 
-    const steps = [
-      { num: "01", title: "Discovery Call", desc: "We learn about your project goals, audience, and brand voice." },
-      { num: "02", title: "Brief & Quote", desc: "Receive a clear scope, timeline, and fixed-price quote — no hidden fees." },
-      { num: "03", title: "Edit & Review", desc: "We deliver a first cut. You give feedback. We refine until it's perfect." },
-      { num: "04", title: "Final Delivery", desc: "Receive export-ready files in all formats you need, with full licensing." },
-    ];
+      <div class="why-card reveal">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.28 2.28C6.81 18 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg>
+        </div>
+        <div>
+          <div class="why-title">Fast Turnaround</div>
+          <p class="why-desc">We respect your deadlines. Most projects delivered within 48–72 hours without sacrificing quality.</p>
+        </div>
+      </div>
 
-    steps.forEach((s, i) => {
-      const cx = 0.4 + i * 2.35;
+      <div class="why-card reveal reveal-delay-1">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+        </div>
+        <div>
+          <div class="why-title">Premium Quality</div>
+          <p class="why-desc">Cinematic grading, sharp audio, and polished graphics on every single project we touch.</p>
+        </div>
+      </div>
 
-      // Card
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: 1.9, w: 2.15, h: 2.9,
-        fill: { color: C.white }, shadow: makeShadow()
-      });
+      <div class="why-card reveal reveal-delay-2">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+        <div>
+          <div class="why-title">Client-First Approach</div>
+          <p class="why-desc">Dedicated editor, clear communication, and revisions until you're 100% satisfied.</p>
+        </div>
+      </div>
 
-      // Number badge
-      slide.addShape(pres.shapes.OVAL, {
-        x: cx + 0.68, y: 2.0, w: 0.78, h: 0.78,
-        fill: { color: C.navy }
-      });
-      slide.addText(s.num, {
-        x: cx + 0.68, y: 2.0, w: 0.78, h: 0.78,
-        fontSize: 18, bold: true, color: C.white, align: "center",
-        valign: "middle", fontFace: "Trebuchet MS", margin: 0
-      });
+      <div class="why-card reveal reveal-delay-3">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+        </div>
+        <div>
+          <div class="why-title">Full-Service Editing</div>
+          <p class="why-desc">Color, sound, motion graphics, and captions — everything under one roof.</p>
+        </div>
+      </div>
 
-      // Title
-      slide.addText(s.title, {
-        x: cx + 0.1, y: 2.9, w: 1.95, h: 0.5,
-        fontSize: 13, bold: true, color: C.dark, align: "center",
-        fontFace: "Trebuchet MS", margin: 0
-      });
+    </div>
+  </div>
+</section>
 
-      // Description
-      slide.addText(s.desc, {
-        x: cx + 0.12, y: 3.45, w: 1.9, h: 1.2,
-        fontSize: 11, color: C.slate, align: "center",
-        fontFace: "Calibri", lineSpacingMultiple: 1.35, margin: 0
-      });
+<!-- CTA -->
+<section id="cta">
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="cta-accent"></div>
+    <h2 class="cta-headline">Let's create something<br>amazing together.</h2>Chat with us now on WhatsAap.
+    <p class="cta-sub">Ready to elevate your video content? Chat with us now on WhatsAap.</p>
+    <a href="mailto:hello@yourstudio.com" class="cta-btn">Chat with us now on WhatsAap</a>
+    <div class="contact-row">
+      <a href="visiongrid.pro@gmail.com" class="contact-item">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        visiongrid.pro@gmail.com
+      </a>
+      <a href="tel:+15551234567" class="contact-item">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+        +91 (738) 981-0459
+      </a>
+    </div>
+    <p class="cta-copy">© 2026 Chromatic visuals. All rights reserved.</p>
+  </div>
+</section>
 
-      // Arrow connector (not after last)
-      if (i < 3) {
-        slide.addShape(pres.shapes.RECTANGLE, {
-          x: cx + 2.15, y: 2.32, w: 0.2, h: 0.04,
-          fill: { color: C.accent }
-        });
-        // Arrowhead
-        slide.addText("›", {
-          x: cx + 2.28, y: 2.18, w: 0.2, h: 0.3,
-          fontSize: 18, color: C.accent, fontFace: "Arial", align: "center",
-          valign: "middle", margin: 0
-        });
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
       }
     });
-  }
+  }, { threshold: 0.12 });
 
-  // ── SLIDE 5: Why Choose Us ────────────────────────────────────────────
-  {
-    const slide = pres.addSlide();
-    slide.background = { color: C.offWhite };
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    const [speedIcon, qualIcon, peopleIcon, editIcon] = await Promise.all([
-      iconToBase64Png(MdSpeed, "#FFFFFF", 256),
-      iconToBase64Png(MdHighQuality, "#FFFFFF", 256),
-      iconToBase64Png(MdPeople, "#FFFFFF", 256),
-      iconToBase64Png(MdMovieEdit, "#FFFFFF", 256),
-    ]);
-
-    // Header
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 0, y: 0, w: 10, h: 1.1,
-      fill: { color: C.navy }
-    });
-    slide.addText("WHY CHOOSE US", {
-      x: 0.6, y: 0, w: 8.8, h: 1.1,
-      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
-      valign: "middle", charSpacing: 4
-    });
-
-    const reasons = [
-      { icon: speedIcon, title: "Fast Turnaround", desc: "We respect your deadlines. Most projects delivered within 48–72 hours without sacrificing quality." },
-      { icon: qualIcon,  title: "Premium Quality", desc: "Cinematic grading, sharp audio, and polished graphics on every single project we touch." },
-      { icon: peopleIcon, title: "Client-First Approach", desc: "Dedicated editor, clear communication, and revisions until you're 100% satisfied." },
-      { icon: editIcon,  title: "Full-Service Editing", desc: "Color, sound, motion graphics, and captions — everything under one roof." },
-    ];
-
-    // 2x2 grid
-    const positions = [
-      [0.4, 1.3], [5.2, 1.3],
-      [0.4, 3.35], [5.2, 3.35],
-    ];
-
-    reasons.forEach((r, i) => {
-      const [cx, cy] = positions[i];
-
-      slide.addShape(pres.shapes.RECTANGLE, {
-        x: cx, y: cy, w: 4.4, h: 1.85,
-        fill: { color: C.white }, shadow: makeShadow()
-      });
-
-      // Icon circle
-      slide.addShape(pres.shapes.OVAL, {
-        x: cx + 0.2, y: cy + 0.53, w: 0.72, h: 0.72,
-        fill: { color: C.navy }
-      });
-      slide.addImage({
-        data: r.icon,
-        x: cx + 0.32, y: cy + 0.65, w: 0.48, h: 0.48
-      });
-
-      slide.addText(r.title, {
-        x: cx + 1.08, y: cy + 0.22, w: 3.1, h: 0.42,
-        fontSize: 14, bold: true, color: C.dark, fontFace: "Trebuchet MS", margin: 0
-      });
-      slide.addText(r.desc, {
-        x: cx + 1.08, y: cy + 0.68, w: 3.1, h: 1.0,
-        fontSize: 11.5, color: C.slate, fontFace: "Calibri",
-        lineSpacingMultiple: 1.35, margin: 0
-      });
-    });
-  }
-
-  // ── SLIDE 7: CTA ──────────────────────────────────────────────────────
-  {
-    const slide = pres.addSlide();
-    slide.background = { color: C.navy };
-
-    // Subtle decorative rectangles
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 7.5, y: -0.5, w: 4, h: 7,
-      fill: { color: "FFFFFF", transparency: 96 }
-    });
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: -1, y: 4, w: 6, h: 4,
-      fill: { color: "FFFFFF", transparency: 96 }
-    });
-
-    // Accent bar
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 3.5, y: 1.05, w: 3.0, h: 0.07,
-      fill: { color: C.accent }
-    });
-
-    slide.addText("Let's create something\namazing together.", {
-      x: 1, y: 1.25, w: 8, h: 1.8,
-      fontSize: 34, bold: true, color: C.white,
-      fontFace: "Trebuchet MS", align: "center", lineSpacingMultiple: 1.25
-    });
-
-    slide.addText("Ready to elevate your video content? Book a free discovery call today.", {
-      x: 1.5, y: 3.15, w: 7, h: 0.5,
-      fontSize: 14, color: "93C5FD", fontFace: "Calibri", align: "center", italic: true
-    });
-
-    // CTA button
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: 3.6, y: 3.9, w: 2.8, h: 0.6,
-      fill: { color: C.accent }
-    });
-    slide.addText("Book a Free Call Today", {
-      x: 3.6, y: 3.9, w: 2.8, h: 0.6,
-      fontSize: 13, bold: true, color: C.white, align: "center",
-      valign: "middle", fontFace: "Calibri", margin: 0
-    });
-
-    // Contact details
-    const [emailIcon, phoneIcon] = await Promise.all([
-      iconToBase64Png(FaEnvelope, "#93C5FD", 128),
-      iconToBase64Png(FaPhone, "#93C5FD", 128),
-    ]);
-
-    slide.addImage({ data: emailIcon, x: 2.8, y: 4.85, w: 0.28, h: 0.28 });
-    slide.addText("hello@yourstudio.com", {
-      x: 3.15, y: 4.83, w: 2.0, h: 0.32,
-      fontSize: 12, color: "93C5FD", fontFace: "Calibri", valign: "middle", margin: 0
-    });
-
-    slide.addImage({ data: phoneIcon, x: 5.45, y: 4.85, w: 0.28, h: 0.28 });
-    slide.addText("+1 (555) 123-4567", {
-      x: 5.8, y: 4.83, w: 2.0, h: 0.32,
-      fontSize: 12, color: "93C5FD", fontFace: "Calibri", valign: "middle", margin: 0
-    });
-
-    slide.addText("© 2026 Your Studio. All rights reserved.", {
-      x: 0, y: 5.3, w: 10, h: 0.25,
-      fontSize: 8.5, color: "475569", align: "center", fontFace: "Calibri"
-    });
-  }
-
-  await pres.writeFile({ fileName: "/home/claude/VideoEditingServices.pptx" });
-  console.log("Done!");
-}
-
-main().catch(console.error);
+  // Hero instant reveal
+  document.querySelectorAll('#hero .hero-headline, #hero .hero-body, #hero .hero-divider, #hero .hero-sub, #hero .hero-title-left, #hero .hero-eyebrow, #hero .hero-tagline, #hero .chips').forEach(el => {
+    el.classList.add('visible');
+  });
+</script>
+</body>
+</html>
