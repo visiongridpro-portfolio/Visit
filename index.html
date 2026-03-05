@@ -1,880 +1,504 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chromatic Visuals — Video Editing</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --cream: #f7f3ee;
-    --blush: #e8d5c4;
-    --rose: #c9a99a;
-    --mauve: #9c7b7b;
-    --deep: #3d2c2c;
-    --warm-white: #faf8f5;
-    --gold: #b8956a;
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--warm-white);
-    color: var(--deep);
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    overflow-x: hidden;
-  }
-
-  /* GRAIN OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.4;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 28px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, rgba(250,248,245,0.95), transparent);
-  }
-
-  .logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    color: var(--deep);
-    text-decoration: none;
-  }
-
-  .logo span { color: var(--gold); font-style: italic; }
-
-  nav ul {
-    list-style: none;
-    display: flex;
-    gap: 40px;
-  }
-
-  nav ul a {
-    text-decoration: none;
-    color: var(--mauve);
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    transition: color 0.3s;
-  }
-
-  nav ul a:hover { color: var(--deep); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 120px 60px 80px;
-    overflow: hidden;
-  }
-
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 60% at 80% 20%, rgba(201,169,154,0.18) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 50% at 10% 80%, rgba(232,213,196,0.25) 0%, transparent 60%),
-      var(--warm-white);
-  }
-
-  .hero-content {
-    position: relative;
-    text-align: center;
-    max-width: 800px;
-    animation: fadeUp 1.2s ease forwards;
-  }
-
-  .eyebrow {
-    font-size: 0.7rem;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 28px;
-    display: block;
-  }
-
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3.5rem, 8vw, 7rem);
-    font-weight: 300;
-    line-height: 1.05;
-    color: var(--deep);
-    margin-bottom: 32px;
-  }
-
-  h1 em {
-    font-style: italic;
-    color: var(--rose);
-  }
-
-  .hero-sub {
-    font-size: 1rem;
-    line-height: 1.8;
-    color: var(--mauve);
-    max-width: 480px;
-    margin: 0 auto 48px;
-    font-weight: 300;
-  }
-
-  .cta-group {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    background: var(--deep);
-    color: var(--cream);
-    padding: 14px 40px;
-    text-decoration: none;
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    transition: all 0.3s;
-    border: 1px solid var(--deep);
-  }
-
-  .btn-primary:hover {
-    background: transparent;
-    color: var(--deep);
-  }
-
-  .btn-secondary {
-    border: 1px solid var(--blush);
-    color: var(--mauve);
-    padding: 14px 40px;
-    text-decoration: none;
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    transition: all 0.3s;
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--rose);
-    color: var(--deep);
-  }
-
-  /* SCROLL INDICATOR */
-  .scroll-hint {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    color: var(--rose);
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    animation: fadeUp 1.8s ease forwards;
-  }
-
-  .scroll-line {
-    width: 1px;
-    height: 50px;
-    background: linear-gradient(to bottom, var(--rose), transparent);
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
-
-  /* SECTION STYLES */
-  section {
-    padding: 120px 60px;
-  }
-
-  .section-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  h2 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2.2rem, 4vw, 3.8rem);
-    font-weight: 300;
-    line-height: 1.15;
-    color: var(--deep);
-  }
-
-  h2 em { font-style: italic; color: var(--rose); }
-
-  /* SERVICES */
-  .services {
-    background: var(--cream);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .services::before {
-    content: '';
-    position: absolute;
-    top: -100px; right: -100px;
-    width: 400px; height: 400px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(201,169,154,0.15), transparent 70%);
-  }
-
-  .services-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: start;
-  }
-
-  .services-left h2 { margin-bottom: 24px; }
-  .services-left p {
-    color: var(--mauve);
-    line-height: 1.9;
-    font-size: 0.95rem;
-    max-width: 380px;
-  }
-
-  .services-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-  }
-
-  .service-card {
-    background: var(--warm-white);
-    padding: 36px 28px;
-    position: relative;
-    transition: all 0.4s;
-    cursor: default;
-  }
-
-  .service-card:hover {
-    background: var(--deep);
-  }
-
-  .service-card:hover .service-title,
-  .service-card:hover .service-desc {
-    color: var(--cream);
-  }
-
-  .service-icon {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  .service-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    font-weight: 400;
-    color: var(--deep);
-    margin-bottom: 10px;
-    transition: color 0.4s;
-  }
-
-  .service-desc {
-    font-size: 0.82rem;
-    color: var(--mauve);
-    line-height: 1.7;
-    transition: color 0.4s;
-  }
-
-  /* WORK / PORTFOLIO */
-  .work {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .work-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 60px;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-
-  .work-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: auto;
-    gap: 16px;
-  }
-
-  .work-item {
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    background: var(--blush);
-  }
-
-  .work-item:nth-child(1) { grid-column: span 7; }
-  .work-item:nth-child(2) { grid-column: span 5; }
-  .work-item:nth-child(3) { grid-column: span 5; }
-  .work-item:nth-child(4) { grid-column: span 7; }
-
-  .work-thumb {
-    width: 100%;
-    aspect-ratio: 16/10;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.6s ease;
-    filter: saturate(0.85);
-  }
-
-  .work-item:hover .work-thumb { transform: scale(1.03); }
-
-  /* Placeholder video thumbnails */
-  .thumb-placeholder {
-    width: 100%;
-    aspect-ratio: 16/10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.6s ease;
-  }
-
-  .work-item:hover .thumb-placeholder { transform: scale(1.03); }
-
-  .thumb-placeholder svg {
-    width: 48px;
-    height: 48px;
-    opacity: 0.5;
-    transition: opacity 0.3s, transform 0.3s;
-    z-index: 2;
-    position: relative;
-  }
-
-  .work-item:hover .thumb-placeholder svg {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-
-  .tp-1 { background: linear-gradient(135deg, #d4b8a8 0%, #c4a090 50%, #b89080 100%); }
-  .tp-2 { background: linear-gradient(135deg, #c8b4a0 0%, #b8a090 50%, #a89080 100%); }
-  .tp-3 { background: linear-gradient(135deg, #e0cfc0 0%, #d0bfb0 50%, #c0afa0 100%); }
-  .tp-4 { background: linear-gradient(135deg, #baa898 0%, #aa9888 50%, #9a8878 100%); }
-
-  .work-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(61,44,44,0.85) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.4s;
-    display: flex;
-    align-items: flex-end;
-    padding: 28px;
-  }
-
-  .work-item:hover .work-overlay { opacity: 1; }
-
-  .work-info { color: var(--cream); }
-  .work-cat {
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--blush);
-    margin-bottom: 6px;
-  }
-  .work-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    font-weight: 300;
-  }
-
-  /* PROCESS */
-  .process {
-    background: var(--deep);
-    color: var(--cream);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .process::before {
-    content: '';
-    position: absolute;
-    bottom: -150px; left: -100px;
-    width: 500px; height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(201,169,154,0.08), transparent 70%);
-  }
-
-  .process-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .process .section-label { color: var(--blush); opacity: 0.7; }
-  .process h2 { color: var(--cream); margin-bottom: 70px; }
-  .process h2 em { color: var(--rose); }
-
-  .process-steps {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-  }
-
-  .step {
-    position: relative;
-    padding-top: 24px;
-    border-top: 1px solid rgba(201,169,154,0.25);
-  }
-
-  .step-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 3.5rem;
-    font-weight: 300;
-    color: rgba(201,169,154,0.2);
-    line-height: 1;
-    margin-bottom: 20px;
-  }
-
-  .step-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    color: var(--cream);
-    margin-bottom: 12px;
-  }
-
-  .step-desc {
-    font-size: 0.82rem;
-    color: rgba(232,213,196,0.6);
-    line-height: 1.8;
-  }
-
-  /* TESTIMONIALS */
-  .testimonials {
-    background: var(--blush);
-    text-align: center;
-  }
-
-  .testimonials-inner {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .testimonials h2 { margin-bottom: 70px; }
-
-  .testimonial-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    text-align: left;
-  }
-
-  .testimonial {
-    background: var(--warm-white);
-    padding: 40px 36px;
-    position: relative;
-  }
-
-  .testimonial::before {
-    content: '"';
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 5rem;
-    color: var(--rose);
-    opacity: 0.3;
-    position: absolute;
-    top: 10px; left: 28px;
-    line-height: 1;
-  }
-
-  .testimonial-text {
-    font-size: 0.9rem;
-    line-height: 1.85;
-    color: var(--deep);
-    margin-bottom: 24px;
-    padding-top: 20px;
-    font-style: italic;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.05rem;
-  }
-
-  .testimonial-author {
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--mauve);
-  }
-
-  /* CONTACT */
-  .contact {
-    text-align: center;
-    background: var(--warm-white);
-  }
-
-  .contact-inner {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .contact h2 { margin-bottom: 20px; }
-  .contact p {
-    color: var(--mauve);
-    line-height: 1.8;
-    margin-bottom: 50px;
-    font-size: 0.95rem;
-  }
-
-  .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .form-row { display: flex; gap: 16px; }
-
-  input, textarea {
-    width: 100%;
-    padding: 16px 20px;
-    background: var(--cream);
-    border: 1px solid var(--blush);
-    color: var(--deep);
-    font-family: 'Jost', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 300;
-    outline: none;
-    transition: border-color 0.3s;
-    resize: none;
-  }
-
-  input::placeholder, textarea::placeholder { color: var(--rose); opacity: 0.7; }
-  input:focus, textarea:focus { border-color: var(--rose); }
-
-  textarea { min-height: 140px; }
-
-  .submit-btn {
-    background: var(--deep);
-    color: var(--cream);
-    border: none;
-    padding: 18px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.3s;
-    width: 100%;
-  }
-
-  .submit-btn:hover { background: var(--mauve); }
-
-  /* FOOTER */
-  footer {
-    background: var(--deep);
-    color: rgba(232,213,196,0.5);
-    padding: 40px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .footer-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    color: var(--cream);
-  }
-
-  .footer-logo span { font-style: italic; color: var(--rose); }
-  footer p { font-size: 0.75rem; }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes scrollPulse {
-    0%, 100% { opacity: 1; transform: scaleY(1); }
-    50% { opacity: 0.3; transform: scaleY(0.6); }
-  }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    nav { padding: 20px 30px; }
-    nav ul { display: none; }
-    section { padding: 80px 30px; }
-    .services-inner { grid-template-columns: 1fr; gap: 50px; }
-    .work-item:nth-child(1),
-    .work-item:nth-child(2),
-    .work-item:nth-child(3),
-    .work-item:nth-child(4) { grid-column: span 12; }
-    .process-steps { grid-template-columns: 1fr 1fr; }
-    .testimonial-grid { grid-template-columns: 1fr; }
-    .form-row { flex-direction: column; }
-    footer { flex-direction: column; text-align: center; }
-  }
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a href="#" class="logo">Frame <span>&</span> Flow</a>
-  <ul>
-    <li><a href="#work">Work</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#process">Process</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-content">
-    <span class="eyebrow">Video Editing · Post Production</span>
-    <h1>Stories told<br>with <em>intention</em></h1>
-    <p class="hero-sub">Thoughtful video editing that honours every frame — from weddings and brand films to creative short-form content.</p>
-    <div class="cta-group">
-      <a href="#work" class="btn-primary">View Work</a>
-      <a href="#contact" class="btn-secondary">Let's Collaborate</a>
-    </div>
-  </div>
-  <div class="scroll-hint">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</section>
-
-<!-- WORK -->
-<section id="work" style="padding: 120px 60px;">
-  <div class="work reveal">
-    <div class="work-header">
-      <div>
-        <span class="section-label">Selected Work</span>
-        <h2>Recent <em>edits</em></h2>
-      </div>
-      <a href="#contact" class="btn-secondary">Commission a project →</a>
-    </div>
-    <div class="work-grid">
-      <div class="work-item">
-        <div class="thumb-placeholder tp-1">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <polygon points="10,8 16,12 10,16" fill="white" stroke="none"/>
-          </svg>
-        </div>
-        <div class="work-overlay">
-          <div class="work-info">
-            <div class="work-cat">Wedding Film</div>
-            <div class="work-title">A Summer in Provence</div>
-          </div>
-        </div>
-      </div>
-      <div class="work-item">
-        <div class="thumb-placeholder tp-2">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <polygon points="10,8 16,12 10,16" fill="white" stroke="none"/>
-          </svg>
-        </div>
-        <div class="work-overlay">
-          <div class="work-info">
-            <div class="work-cat">Brand Film</div>
-            <div class="work-title">Maison Elara — Launch</div>
-          </div>
-        </div>
-      </div>
-      <div class="work-item">
-        <div class="thumb-placeholder tp-3">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <polygon points="10,8 16,12 10,16" fill="white" stroke="none"/>
-          </svg>
-        </div>
-        <div class="work-overlay">
-          <div class="work-info">
-            <div class="work-cat">Short Film</div>
-            <div class="work-title">Quiet Hours</div>
-          </div>
-        </div>
-      </div>
-      <div class="work-item">
-        <div class="thumb-placeholder tp-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <polygon points="10,8 16,12 10,16" fill="white" stroke="none"/>
-          </svg>
-        </div>
-        <div class="work-overlay">
-          <div class="work-info">
-            <div class="work-cat">Social Content</div>
-            <div class="work-title">Botanica Series — Reel</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICES -->
-<section id="services" class="services">
-  <div class="services-inner reveal">
-    <div class="services-left">
-      <span class="section-label">What I Offer</span>
-      <h2>Edit packages<br>for every <em>story</em></h2>
-      <p style="margin-top: 24px;">Every project is handled with care, intention, and an eye for the moments that matter. I work closely with each client to ensure the final edit feels unmistakably theirs.</p>
-    </div>
-    <div class="services-grid">
-      <div class="service-card">
-        <span class="service-icon">🎞</span>
-        <div class="service-title">Wedding Films</div>
-        <div class="service-desc">Cinematic, emotive edits that preserve the feeling of your day, forever.</div>
-      </div>
-      <div class="service-card">
-        <span class="service-icon">✦</span>
-        <div class="service-title">Brand Videos</div>
-        <div class="service-desc">Polished storytelling that elevates your brand and connects with your audience.</div>
-      </div>
-      <div class="service-card">
-        <span class="service-icon">◈</span>
-        <div class="service-title">Short Form</div>
-        <div class="service-desc">Reels, TikToks, and social content edited to stop the scroll.</div>
-      </div>
-      <div class="service-card">
-        <span class="service-icon">◯</span>
-        <div class="service-title">Short Films</div>
-        <div class="service-desc">Narrative editing with rhythm and intention for independent filmmakers.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROCESS -->
-<section id="process" class="process">
-  <div class="process-inner reveal">
-    <span class="section-label">How It Works</span>
-    <h2>A thoughtful<br><em>process</em>, start to finish</h2>
-    <div class="process-steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-title">Discovery</div>
-        <div class="step-desc">We begin with a conversation — your vision, your references, your feeling.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-title">First Cut</div>
-        <div class="step-desc">I craft an initial edit, building the story's structure and emotional arc.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-title">Refinement</div>
-        <div class="step-desc">Two rounds of revisions to fine-tune pacing, music, and colour grade.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <div class="step-title">Delivery</div>
-        <div class="step-desc">Your final files, export-ready in any format you need.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="testimonials">
-  <div class="testimonials-inner reveal">
-    <span class="section-label">Kind Words</span>
-    <h2>What clients <em>say</em></h2>
-    <div class="testimonial-grid">
-      <div class="testimonial">
-        <div class="testimonial-text">The edit made me cry the first time I watched it. Every small moment was captured so thoughtfully — I couldn't have asked for more.</div>
-        <div class="testimonial-author">— Sophie & James, Wedding Film</div>
-      </div>
-      <div class="testimonial">
-        <div class="testimonial-text">Our brand video has completely changed how people perceive us. The pacing, the music, the colour — everything felt intentional and elevated.</div>
-        <div class="testimonial-author">— Mara Chen, Founder, Maison Elara</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact" class="contact">
-  <div class="contact-inner reveal">
-    <span class="section-label">Get In Touch</span>
-    <h2>Let's make<br>something <em>beautiful</em></h2>
-    <p>Tell me about your project and I'll be in touch within 48 hours.</p>
-    <div class="contact-form">
-      <div class="form-row">
-        <input type="text" placeholder="Your name">
-        <input type="email" placeholder="Email address">
-      </div>
-      <input type="text" placeholder="Project type (e.g. Wedding film, Brand video)">
-      <textarea placeholder="Tell me about your project — vision, timeline, any references you love..."></textarea>
-      <button class="submit-btn">Send Message</button>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">Frame <span>&</span> Flow</div>
-  <p>© 2026 · Video Editing Services · All rights reserved</p>
-</footer>
-
-<script>
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+const pptxgen = require("pptxgenjs");
+const React = require("react");
+const ReactDOMServer = require("react-dom/server");
+const sharp = require("sharp");
+
+// Icon imports
+const { FaYoutube, FaFilm, FaBuilding, FaStar, FaCheck, FaClock, FaEnvelope, FaPhone } = require("react-icons/fa");
+const { MdMovieEdit, MdSpeed, MdHighQuality, MdPeople } = require("react-icons/md");
+
+async function iconToBase64Png(IconComponent, color, size = 256) {
+  const svg = ReactDOMServer.renderToStaticMarkup(
+    React.createElement(IconComponent, { color, size: String(size) })
+  );
+  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+  return "image/png;base64," + pngBuffer.toString("base64");
+}
+
+async function main() {
+  const pres = new pptxgen();
+  pres.layout = "LAYOUT_16x9";
+  pres.title = "Video Editing Services";
+
+  // Color palette — clean & professional
+  const C = {
+    navy:    "1B2B4B",
+    blue:    "2563EB",
+    lightBlue: "DBEAFE",
+    slate:   "64748B",
+    offWhite:"F8FAFC",
+    white:   "FFFFFF",
+    dark:    "0F172A",
+    accent:  "3B82F6",
+    muted:   "94A3B8",
+    cardBg:  "F1F5F9",
+  };
+
+  const makeShadow = () => ({ type: "outer", blur: 8, offset: 3, angle: 135, color: "000000", opacity: 0.08 });
+
+  // ── SLIDE 1: Title ────────────────────────────────────────────────────
+  {
+    const slide = pres.addSlide();
+    slide.background = { color: C.white };
+
+    // Left accent panel
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 3.8, h: 5.625,
+      fill: { color: C.navy }
+    });
+
+    // Decorative blue rectangle inside panel
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 3.8, w: 3.8, h: 0.08,
+      fill: { color: C.accent }
+    });
+
+    // Film-strip decorative lines
+    for (let i = 0; i < 6; i++) {
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: 0.25, y: 0.5 + i * 0.55, w: 0.35, h: 0.38,
+        fill: { color: "FFFFFF", transparency: 85 }
+      });
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: 3.2, y: 0.5 + i * 0.55, w: 0.35, h: 0.38,
+        fill: { color: "FFFFFF", transparency: 85 }
+      });
+    }
+
+    // Left panel text
+    slide.addText("VIDEO\nEDITING\nSERVICES", {
+      x: 0.5, y: 1.2, w: 2.8, h: 2.2,
+      fontSize: 28, bold: true, color: C.white,
+      fontFace: "Trebuchet MS", align: "left",
+      lineSpacingMultiple: 1.2
+    });
+    slide.addText("Professional. Creative. Delivered.", {
+      x: 0.5, y: 3.55, w: 2.8, h: 0.45,
+      fontSize: 11, color: "93C5FD", fontFace: "Calibri", align: "left",
+      italic: true
+    });
+
+    // Right side content
+    slide.addText("Crafting stories that", {
+      x: 4.3, y: 1.1, w: 5.3, h: 0.55,
+      fontSize: 30, bold: true, color: C.dark, fontFace: "Trebuchet MS"
+    });
+    slide.addText("captivate & convert.", {
+      x: 4.3, y: 1.65, w: 5.3, h: 0.6,
+      fontSize: 30, bold: true, color: C.blue, fontFace: "Trebuchet MS"
+    });
+
+    slide.addText("From YouTube content to corporate promos —\nwe bring your vision to life with precision and style.", {
+      x: 4.3, y: 2.5, w: 5.3, h: 1.0,
+      fontSize: 13.5, color: C.slate, fontFace: "Calibri", lineSpacingMultiple: 1.4
+    });
+
+    // Three service chips
+    const chips = ["YouTube & Social", "Corporate Video"];
+    chips.forEach((label, i) => {
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: 4.3 + i * 1.82, y: 3.75, w: 1.65, h: 0.42,
+        fill: { color: C.lightBlue }, line: { color: C.accent, width: 1 }
+      });
+      slide.addText(label, {
+        x: 4.3 + i * 1.82, y: 3.75, w: 1.65, h: 0.42,
+        fontSize: 9.5, color: C.blue, bold: true, align: "center", valign: "middle",
+        fontFace: "Calibri", margin: 0
+      });
+    });
+
+    // Bottom tagline
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 4.3, y: 4.6, w: 5.3, h: 0.02,
+      fill: { color: C.muted }
+    });
+    slide.addText("Elevating brands through compelling visual storytelling", {
+      x: 4.3, y: 4.75, w: 5.3, h: 0.4,
+      fontSize: 11, color: C.muted, italic: true, fontFace: "Calibri"
+    });
+  }
+
+  // ── SLIDE 2: About / Value Prop ───────────────────────────────────────
+  {
+    const slide = pres.addSlide();
+    slide.background = { color: C.offWhite };
+
+    // Header band
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 10, h: 1.1,
+      fill: { color: C.navy }
+    });
+    slide.addText("ABOUT US", {
+      x: 0.6, y: 0, w: 8.8, h: 1.1,
+      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
+      valign: "middle", charSpacing: 4
+    });
+
+    // Main headline
+    slide.addText("We don't just edit video —\nwe shape narratives.", {
+      x: 0.6, y: 1.3, w: 4.5, h: 1.5,
+      fontSize: 22, bold: true, color: C.dark, fontFace: "Trebuchet MS",
+      lineSpacingMultiple: 1.3
+    });
+
+    slide.addText("Our team brings deep technical expertise and a creative eye to every project. Whether you need a polished brand promo, a scroll-stopping social reel, or a cinematic short film — we deliver quality that speaks for itself.", {
+      x: 0.6, y: 2.9, w: 4.5, h: 1.5,
+      fontSize: 13, color: C.slate, fontFace: "Calibri", lineSpacingMultiple: 1.5
+    });
+
+    // Stats cards
+    const stats = [
+      { num: "24+", label: "Projects Delivered" },
+      { num: "95%", label: "Client Satisfaction" },
+      { num: "2hr", label: "Avg. Turnaround" },
+    ];
+    stats.forEach((s, i) => {
+      const cx = 5.6 + i * 1.45;
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: 1.4, w: 1.25, h: 1.5,
+        fill: { color: C.white }, shadow: makeShadow()
+      });
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: 1.4, w: 1.25, h: 0.07,
+        fill: { color: C.accent }
+      });
+      slide.addText(s.num, {
+        x: cx, y: 1.55, w: 1.25, h: 0.7,
+        fontSize: 26, bold: true, color: C.blue, align: "center", fontFace: "Trebuchet MS", margin: 0
+      });
+      slide.addText(s.label, {
+        x: cx, y: 2.3, w: 1.25, h: 0.5,
+        fontSize: 9, color: C.slate, align: "center", fontFace: "Calibri", margin: 0
+      });
+    });
+
+    // Qualities list
+    const quals = [
+      "Dedicated editor for every project",
+      "Revision rounds included",
+      "Source files & full licensing",
+      "Transparent pricing, no surprises",
+    ];
+    quals.forEach((q, i) => {
+      slide.addShape(pres.shapes.OVAL, {
+        x: 5.6, y: 3.25 + i * 0.48, w: 0.22, h: 0.22,
+        fill: { color: C.accent }
+      });
+      slide.addText(q, {
+        x: 5.95, y: 3.2 + i * 0.48, w: 3.8, h: 0.35,
+        fontSize: 12, color: C.dark, fontFace: "Calibri", valign: "middle", margin: 0
+      });
+    });
+  }
+
+  // ── SLIDE 3: Services ─────────────────────────────────────────────────
+  {
+    const slide = pres.addSlide();
+    slide.background = { color: C.white };
+
+    // Pre-render icons
+    const [ytIcon, corpIcon] = await Promise.all([
+      iconToBase64Png(FaYoutube, "#FFFFFF", 256),
+      iconToBase64Png(FaBuilding, "#FFFFFF", 256),
+    ]);
+
+    // Header
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 10, h: 1.1,
+      fill: { color: C.navy }
+    });
+    slide.addText("OUR SERVICES", {
+      x: 0.6, y: 0, w: 8.8, h: 1.1,
+      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
+      valign: "middle", charSpacing: 4
+    });
+
+    // Three service cards
+    const services = [
+      {
+        icon: ytIcon,
+        title: "YouTube & Social Media",
+        bullets: [
+          "Reels, Shorts & TikTok edits",
+          "Color grading & motion graphics",
+          "Captions & subtitles",
+          "Thumbnail design",
+          "Fast turnaround for creators",
+        ],
+      },
+      {
+        icon: corpIcon,
+        title: "Corporate & Promo Video",
+        bullets: [
+          "Brand films & explainers",
+          "Product showcase videos",
+          "Interviews & testimonials",
+          "Trade show & event highlights",
+          "Branded lower-thirds & intros",
+        ],
+      },
+    ];
+
+    services.forEach((svc, i) => {
+      const cx = 0.6 + i * 4.8;
+
+      // Card background
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: 1.25, w: 4.4, h: 4.0,
+        fill: { color: C.cardBg }, shadow: makeShadow()
+      });
+
+      // Top accent bar
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: 1.25, w: 4.4, h: 0.07,
+        fill: { color: C.accent }
+      });
+
+      // Icon circle
+      slide.addShape(pres.shapes.OVAL, {
+        x: cx + 1.82, y: 1.45, w: 0.75, h: 0.75,
+        fill: { color: C.navy }
+      });
+      slide.addImage({
+        data: svc.icon,
+        x: cx + 1.94, y: 1.57, w: 0.5, h: 0.5
+      });
+
+      // Title
+      slide.addText(svc.title, {
+        x: cx + 0.12, y: 2.32, w: 4.15, h: 0.55,
+        fontSize: 15, bold: true, color: C.dark, align: "center",
+        fontFace: "Trebuchet MS", lineSpacingMultiple: 1.2, margin: 0
+      });
+
+      // Bullets
+      slide.addText(
+        svc.bullets.map((b, j) => ({
+          text: b,
+          options: { bullet: true, breakLine: j < svc.bullets.length - 1 }
+        })),
+        {
+          x: cx + 0.3, y: 2.98, w: 3.8, h: 2.1,
+          fontSize: 12, color: C.slate, fontFace: "Calibri",
+          paraSpaceAfter: 6, lineSpacingMultiple: 1.3
+        }
+      );
+    });
+  }
+
+  // ── SLIDE 4: Process ──────────────────────────────────────────────────
+  {
+    const slide = pres.addSlide();
+    slide.background = { color: C.offWhite };
+
+    // Header
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 10, h: 1.1,
+      fill: { color: C.navy }
+    });
+    slide.addText("HOW IT WORKS", {
+      x: 0.6, y: 0, w: 8.8, h: 1.1,
+      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
+      valign: "middle", charSpacing: 4
+    });
+
+    slide.addText("A simple, transparent process from brief to final delivery.", {
+      x: 0.6, y: 1.25, w: 8.8, h: 0.45,
+      fontSize: 14, color: C.slate, fontFace: "Calibri"
+    });
+
+    const steps = [
+      { num: "01", title: "Discovery Call", desc: "We learn about your project goals, audience, and brand voice." },
+      { num: "02", title: "Brief & Quote", desc: "Receive a clear scope, timeline, and fixed-price quote — no hidden fees." },
+      { num: "03", title: "Edit & Review", desc: "We deliver a first cut. You give feedback. We refine until it's perfect." },
+      { num: "04", title: "Final Delivery", desc: "Receive export-ready files in all formats you need, with full licensing." },
+    ];
+
+    steps.forEach((s, i) => {
+      const cx = 0.4 + i * 2.35;
+
+      // Card
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: 1.9, w: 2.15, h: 2.9,
+        fill: { color: C.white }, shadow: makeShadow()
+      });
+
+      // Number badge
+      slide.addShape(pres.shapes.OVAL, {
+        x: cx + 0.68, y: 2.0, w: 0.78, h: 0.78,
+        fill: { color: C.navy }
+      });
+      slide.addText(s.num, {
+        x: cx + 0.68, y: 2.0, w: 0.78, h: 0.78,
+        fontSize: 18, bold: true, color: C.white, align: "center",
+        valign: "middle", fontFace: "Trebuchet MS", margin: 0
+      });
+
+      // Title
+      slide.addText(s.title, {
+        x: cx + 0.1, y: 2.9, w: 1.95, h: 0.5,
+        fontSize: 13, bold: true, color: C.dark, align: "center",
+        fontFace: "Trebuchet MS", margin: 0
+      });
+
+      // Description
+      slide.addText(s.desc, {
+        x: cx + 0.12, y: 3.45, w: 1.9, h: 1.2,
+        fontSize: 11, color: C.slate, align: "center",
+        fontFace: "Calibri", lineSpacingMultiple: 1.35, margin: 0
+      });
+
+      // Arrow connector (not after last)
+      if (i < 3) {
+        slide.addShape(pres.shapes.RECTANGLE, {
+          x: cx + 2.15, y: 2.32, w: 0.2, h: 0.04,
+          fill: { color: C.accent }
+        });
+        // Arrowhead
+        slide.addText("›", {
+          x: cx + 2.28, y: 2.18, w: 0.2, h: 0.3,
+          fontSize: 18, color: C.accent, fontFace: "Arial", align: "center",
+          valign: "middle", margin: 0
+        });
       }
     });
-  }, { threshold: 0.1 });
+  }
 
-  reveals.forEach(el => observer.observe(el));
+  // ── SLIDE 5: Why Choose Us ────────────────────────────────────────────
+  {
+    const slide = pres.addSlide();
+    slide.background = { color: C.offWhite };
 
-  // Smooth form feedback
-  document.querySelector('.submit-btn').addEventListener('click', function() {
-    this.textContent = 'Message Sent ✓';
-    this.style.background = 'var(--rose)';
-    setTimeout(() => {
-      this.textContent = 'Send Message';
-      this.style.background = 'var(--deep)';
-    }, 3000);
-  });
-</script>
-</body>
-</html>
+    const [speedIcon, qualIcon, peopleIcon, editIcon] = await Promise.all([
+      iconToBase64Png(MdSpeed, "#FFFFFF", 256),
+      iconToBase64Png(MdHighQuality, "#FFFFFF", 256),
+      iconToBase64Png(MdPeople, "#FFFFFF", 256),
+      iconToBase64Png(MdMovieEdit, "#FFFFFF", 256),
+    ]);
+
+    // Header
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 10, h: 1.1,
+      fill: { color: C.navy }
+    });
+    slide.addText("WHY CHOOSE US", {
+      x: 0.6, y: 0, w: 8.8, h: 1.1,
+      fontSize: 13, bold: true, color: C.muted, fontFace: "Calibri",
+      valign: "middle", charSpacing: 4
+    });
+
+    const reasons = [
+      { icon: speedIcon, title: "Fast Turnaround", desc: "We respect your deadlines. Most projects delivered within 48–72 hours without sacrificing quality." },
+      { icon: qualIcon,  title: "Premium Quality", desc: "Cinematic grading, sharp audio, and polished graphics on every single project we touch." },
+      { icon: peopleIcon, title: "Client-First Approach", desc: "Dedicated editor, clear communication, and revisions until you're 100% satisfied." },
+      { icon: editIcon,  title: "Full-Service Editing", desc: "Color, sound, motion graphics, and captions — everything under one roof." },
+    ];
+
+    // 2x2 grid
+    const positions = [
+      [0.4, 1.3], [5.2, 1.3],
+      [0.4, 3.35], [5.2, 3.35],
+    ];
+
+    reasons.forEach((r, i) => {
+      const [cx, cy] = positions[i];
+
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: cx, y: cy, w: 4.4, h: 1.85,
+        fill: { color: C.white }, shadow: makeShadow()
+      });
+
+      // Icon circle
+      slide.addShape(pres.shapes.OVAL, {
+        x: cx + 0.2, y: cy + 0.53, w: 0.72, h: 0.72,
+        fill: { color: C.navy }
+      });
+      slide.addImage({
+        data: r.icon,
+        x: cx + 0.32, y: cy + 0.65, w: 0.48, h: 0.48
+      });
+
+      slide.addText(r.title, {
+        x: cx + 1.08, y: cy + 0.22, w: 3.1, h: 0.42,
+        fontSize: 14, bold: true, color: C.dark, fontFace: "Trebuchet MS", margin: 0
+      });
+      slide.addText(r.desc, {
+        x: cx + 1.08, y: cy + 0.68, w: 3.1, h: 1.0,
+        fontSize: 11.5, color: C.slate, fontFace: "Calibri",
+        lineSpacingMultiple: 1.35, margin: 0
+      });
+    });
+  }
+
+  // ── SLIDE 7: CTA ──────────────────────────────────────────────────────
+  {
+    const slide = pres.addSlide();
+    slide.background = { color: C.navy };
+
+    // Subtle decorative rectangles
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 7.5, y: -0.5, w: 4, h: 7,
+      fill: { color: "FFFFFF", transparency: 96 }
+    });
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: -1, y: 4, w: 6, h: 4,
+      fill: { color: "FFFFFF", transparency: 96 }
+    });
+
+    // Accent bar
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 3.5, y: 1.05, w: 3.0, h: 0.07,
+      fill: { color: C.accent }
+    });
+
+    slide.addText("Let's create something\namazing together.", {
+      x: 1, y: 1.25, w: 8, h: 1.8,
+      fontSize: 34, bold: true, color: C.white,
+      fontFace: "Trebuchet MS", align: "center", lineSpacingMultiple: 1.25
+    });
+
+    slide.addText("Ready to elevate your video content? Book a free discovery call today.", {
+      x: 1.5, y: 3.15, w: 7, h: 0.5,
+      fontSize: 14, color: "93C5FD", fontFace: "Calibri", align: "center", italic: true
+    });
+
+    // CTA button
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: 3.6, y: 3.9, w: 2.8, h: 0.6,
+      fill: { color: C.accent }
+    });
+    slide.addText("Book a Free Call Today", {
+      x: 3.6, y: 3.9, w: 2.8, h: 0.6,
+      fontSize: 13, bold: true, color: C.white, align: "center",
+      valign: "middle", fontFace: "Calibri", margin: 0
+    });
+
+    // Contact details
+    const [emailIcon, phoneIcon] = await Promise.all([
+      iconToBase64Png(FaEnvelope, "#93C5FD", 128),
+      iconToBase64Png(FaPhone, "#93C5FD", 128),
+    ]);
+
+    slide.addImage({ data: emailIcon, x: 2.8, y: 4.85, w: 0.28, h: 0.28 });
+    slide.addText("hello@yourstudio.com", {
+      x: 3.15, y: 4.83, w: 2.0, h: 0.32,
+      fontSize: 12, color: "93C5FD", fontFace: "Calibri", valign: "middle", margin: 0
+    });
+
+    slide.addImage({ data: phoneIcon, x: 5.45, y: 4.85, w: 0.28, h: 0.28 });
+    slide.addText("+1 (555) 123-4567", {
+      x: 5.8, y: 4.83, w: 2.0, h: 0.32,
+      fontSize: 12, color: "93C5FD", fontFace: "Calibri", valign: "middle", margin: 0
+    });
+
+    slide.addText("© 2026 Your Studio. All rights reserved.", {
+      x: 0, y: 5.3, w: 10, h: 0.25,
+      fontSize: 8.5, color: "475569", align: "center", fontFace: "Calibri"
+    });
+  }
+
+  await pres.writeFile({ fileName: "/home/claude/VideoEditingServices.pptx" });
+  console.log("Done!");
+}
+
+main().catch(console.error);
