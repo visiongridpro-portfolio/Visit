@@ -118,63 +118,6 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
 .rating-intro h2 { margin-top: 10px; }
 .rating-intro > p:last-child { max-width: 220px; margin: 15px 0 0; color: var(--muted); font-size: 15px; line-height: 1.45; }
 .rating-form { max-width: 500px; }
-.rating-form input[type="text"] {
-  width: 100%;
-  margin-bottom: 18px;
-  padding: 12px 0;
-  border: 0;
-  border-bottom: 1px solid rgba(29, 38, 48, .25);
-  outline: 0;
-  color: var(--ink);
-  background: transparent;
-  font: 15px/1.45 var(--sans);
-}
-.rating-form input[type="text"]::placeholder { color: #82908b; }
-.rating-form input[type="text"]:focus { border-color: var(--accent); }
-.rating-list-wrap { max-width: 500px; margin-top: 28px; }
-.rating-list-title {
-  margin: 0 0 12px;
-  color: var(--muted);
-  font: 10px var(--mono);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-}
-.rating-list { display: grid; gap: 8px; }
-.rating-entry {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 11px 0;
-  border-top: 1px solid rgba(29, 38, 48, .12);
-}
-.rating-entry-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 14px;
-  font-weight: 600;
-}
-.rating-entry-stars {
-  flex: 0 0 auto;
-  color: #e1a537;
-  letter-spacing: 2px;
-  font-size: 14px;
-}
-.rating-form input[type="text"] {
-  width: 100%;
-  margin-bottom: 18px;
-  padding: 12px 0;
-  border: 0;
-  border-bottom: 1px solid rgba(29, 38, 48, .25);
-  outline: 0;
-  color: var(--ink);
-  background: transparent;
-  font: 15px/1.45 var(--sans);
-}
-.rating-form input[type="text"]::placeholder { color: #82908b; }
-.rating-form input[type="text"]:focus { border-color: var(--accent); }
 .stars { display: flex; gap: 7px; margin-bottom: 18px; }
 .star-button { padding: 0; border: 0; color: #b6c6c1; background: transparent; cursor: pointer; font-size: clamp(31px, 3.4vw, 43px); line-height: 1; transition: color .18s ease, transform .18s ease; }
 .star-button:hover, .star-button:focus-visible, .star-button.is-selected { color: #e1a537; }
@@ -331,17 +274,6 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
           <p>No login. Just one quick rating.</p>
         </div>
         <form class="rating-form" id="rating-form">
-          <label class="sr-only" for="rating-name">Your name</label>
-          <input
-            id="rating-name"
-            name="name"
-            type="text"
-            maxlength="80"
-            autocomplete="name"
-            required
-            placeholder="Your name"
-            aria-label="Your name"
-          />
           <div class="stars" role="radiogroup" aria-label="Rate this portfolio from one to five stars">
             <button class="star-button" type="button" data-rating="1" role="radio" aria-checked="false" aria-label="1 star">★</button>
             <button class="star-button" type="button" data-rating="2" role="radio" aria-checked="false" aria-label="2 stars">★</button>
@@ -349,16 +281,13 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
             <button class="star-button" type="button" data-rating="4" role="radio" aria-checked="false" aria-label="4 stars">★</button>
             <button class="star-button" type="button" data-rating="5" role="radio" aria-checked="false" aria-label="5 stars">★</button>
           </div>
+          <label class="sr-only" for="rating-note">Optional note</label>
+          <textarea id="rating-note" name="note" maxlength="280" placeholder="A few words, if you'd like…"></textarea>
           <div class="rating-submit-row">
             <button class="rating-submit" type="submit">Send rating <span>↗</span></button>
             <p class="rating-message" id="rating-message" role="status" aria-live="polite"></p>
           </div>
         </form>
-
-        <div class="rating-list-wrap" aria-live="polite">
-          <p class="rating-list-title">Recent ratings</p>
-          <div class="rating-list" id="rating-list"></div>
-        </div>
       </section>
 
       <section class="contact section-shell reveal" id="contact">
@@ -408,7 +337,7 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
   1. Replace Your Name, role, email, Instagram and WhatsApp details below.
   2. Paste the full YouTube URL (unlisted URLs work) or just its video ID in `youtube`.
   3. Change project titles / descriptions as needed.
-  4. Ratings are saved in the visitor's browser and displayed as name + stars below the form.
+  4. To collect ratings from every visitor, add your form-service endpoint to `ratingEndpoint`.
 */
 const site = {
   name: 'Buffling Speed (Chetan)',
@@ -420,7 +349,7 @@ const site = {
 };
 
 const projects = [
-  {
+{
     title: 'Video 01',
     type: 'Short-form film',
     youtube: 'https://youtube.com/shorts/iexj7cn7JKU?feature=share',
@@ -553,74 +482,39 @@ starButtons.forEach((button) => {
   });
 });
 
-const ratingList = document.querySelector('#rating-list');
-const ratingNameInput = document.querySelector('#rating-name');
-const ratingStorageKey = 'portfolio-ratings';
-
-const loadRatings = () => {
-  try {
-    return JSON.parse(localStorage.getItem(ratingStorageKey) || '[]');
-  } catch {
-    return [];
-  }
-};
-
-const renderRatings = () => {
-  const ratings = loadRatings();
-  ratingList.innerHTML = '';
-
-  ratings.slice().reverse().forEach((item) => {
-    const entry = document.createElement('div');
-    entry.className = 'rating-entry';
-
-    const name = document.createElement('span');
-    name.className = 'rating-entry-name';
-    name.textContent = item.name;
-
-    const stars = document.createElement('span');
-    stars.className = 'rating-entry-stars';
-    stars.setAttribute('aria-label', `${item.rating} out of 5 stars`);
-    stars.textContent = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
-
-    entry.append(name, stars);
-    ratingList.appendChild(entry);
-  });
-};
-
-ratingForm.addEventListener('submit', (event) => {
+ratingForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-
-  const name = ratingNameInput.value.trim();
-
-  if (!name) {
-    ratingMessage.textContent = 'Please enter your name.';
-    ratingNameInput.focus();
-    return;
-  }
-
   if (!selectedRating) {
     ratingMessage.textContent = 'Please choose a star rating first.';
     return;
   }
 
-  const ratings = loadRatings();
-  ratings.push({
-    name,
+  const feedback = {
     rating: selectedRating,
+    note: document.querySelector('#rating-note').value.trim(),
     submittedAt: new Date().toISOString(),
-  });
+  };
 
-  // Keep the browser-side list small.
-  localStorage.setItem(ratingStorageKey, JSON.stringify(ratings.slice(-20)));
+  if (site.ratingEndpoint) {
+    try {
+      const response = await fetch(site.ratingEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(feedback),
+      });
+      if (!response.ok) throw new Error('Rating service unavailable');
+      ratingMessage.textContent = 'Thank you — your rating has been sent.';
+    } catch {
+      ratingMessage.textContent = 'Could not send it right now. Please try again soon.';
+      return;
+    }
+  } else {
+    localStorage.setItem('portfolio-rating', JSON.stringify(feedback));
+    ratingMessage.textContent = 'Thank you for your rating!';
+  }
 
-  ratingMessage.textContent = 'Thank you for your rating!';
-  ratingNameInput.value = '';
-  selectedRating = 0;
-  paintStars();
-  renderRatings();
+  ratingForm.querySelector('#rating-note').value = '';
 });
-
-renderRatings();
 
 
 /* --- Live anime-inspired background: sakura + ink waves + speed lines --- */
