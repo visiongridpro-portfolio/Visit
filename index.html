@@ -29,14 +29,33 @@ body {
   min-width: 320px;
   margin: 0;
   color: var(--ink);
-  background: var(--paper);
+  background: #f7f4ee;
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  isolation: isolate;
 }
 
-.page-glow { position: fixed; z-index: -1; border-radius: 50%; filter: blur(2px); pointer-events: none; }
-.glow-one { width: 38vw; height: 38vw; top: -24vw; right: -6vw; background: rgba(231, 230, 255, .45); }
-.glow-two { width: 25vw; height: 25vw; bottom: 10vw; left: -16vw; background: rgba(237, 246, 243, .7); }
+#anime-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.anime-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.14), transparent 48%),
+    linear-gradient(180deg, rgba(247,244,238,.12), rgba(247,244,238,.32));
+}
+
+.page-glow { display: none; }
 
 .section-shell, .site-header { width: min(100% - 64px, 1280px); margin-inline: auto; }
 .site-header {
@@ -99,6 +118,19 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
 .rating-intro h2 { margin-top: 10px; }
 .rating-intro > p:last-child { max-width: 220px; margin: 15px 0 0; color: var(--muted); font-size: 15px; line-height: 1.45; }
 .rating-form { max-width: 500px; }
+.rating-form input[type="text"] {
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(29, 38, 48, .25);
+  outline: 0;
+  color: var(--ink);
+  background: transparent;
+  font: 15px/1.45 var(--sans);
+}
+.rating-form input[type="text"]::placeholder { color: #82908b; }
+.rating-form input[type="text"]:focus { border-color: var(--accent); }
 .stars { display: flex; gap: 7px; margin-bottom: 18px; }
 .star-button { padding: 0; border: 0; color: #b6c6c1; background: transparent; cursor: pointer; font-size: clamp(31px, 3.4vw, 43px); line-height: 1; transition: color .18s ease, transform .18s ease; }
 .star-button:hover, .star-button:focus-visible, .star-button.is-selected { color: #e1a537; }
@@ -161,11 +193,40 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+
+/* Anime-inspired moving atmosphere */
+.site-header,
+.about,
+.rating,
+.contact,
+.site-footer {
+  position: relative;
+}
+
+.site-header {
+  background: rgba(247,244,238,.42);
+  backdrop-filter: blur(7px);
+}
+
+.video-card .card-meta {
+  position: relative;
+  z-index: 1;
+}
+
+.rating {
+  background: rgba(237,246,243,.76);
+  backdrop-filter: blur(10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #anime-bg { display: none; }
+}
+
 </style>
   </head>
   <body>
-    <div class="page-glow glow-one" aria-hidden="true"></div>
-    <div class="page-glow glow-two" aria-hidden="true"></div>
+    <canvas id="anime-bg" aria-hidden="true"></canvas>
+    <div class="anime-vignette" aria-hidden="true"></div>
 
     <header class="site-header">
       <a class="brand" href="#top" aria-label="Home">
@@ -226,6 +287,17 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
           <p>No login. Just one quick rating.</p>
         </div>
         <form class="rating-form" id="rating-form">
+          <label class="sr-only" for="rating-name">Your name</label>
+          <input
+            id="rating-name"
+            name="name"
+            type="text"
+            maxlength="80"
+            autocomplete="name"
+            required
+            placeholder="Your name"
+            aria-label="Your name"
+          />
           <div class="stars" role="radiogroup" aria-label="Rate this portfolio from one to five stars">
             <button class="star-button" type="button" data-rating="1" role="radio" aria-checked="false" aria-label="1 star">★</button>
             <button class="star-button" type="button" data-rating="2" role="radio" aria-checked="false" aria-label="2 stars">★</button>
@@ -233,8 +305,6 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
             <button class="star-button" type="button" data-rating="4" role="radio" aria-checked="false" aria-label="4 stars">★</button>
             <button class="star-button" type="button" data-rating="5" role="radio" aria-checked="false" aria-label="5 stars">★</button>
           </div>
-          <label class="sr-only" for="rating-note">Optional note</label>
-          <textarea id="rating-note" name="note" maxlength="280" placeholder="A few words, if you'd like…"></textarea>
           <div class="rating-submit-row">
             <button class="rating-submit" type="submit">Send rating <span>↗</span></button>
             <p class="rating-message" id="rating-message" role="status" aria-live="polite"></p>
@@ -289,19 +359,19 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
   1. Replace Your Name, role, email, Instagram and WhatsApp details below.
   2. Paste the full YouTube URL (unlisted URLs work) or just its video ID in `youtube`.
   3. Change project titles / descriptions as needed.
-  4. To collect ratings from every visitor, add your form-service endpoint to `ratingEndpoint`.
+  4. Ratings are sent by FormSubmit to the email in `ratingEndpoint` (first submission requires email activation).
 */
 const site = {
-  name: 'Baffling Speed (Chetan)',
+  name: 'Buffling Speed (Chetan)',
   role: 'Video editor & visual storyteller',
   email: 'visiongrid.pro@gmail.com',
   instagram: '@baffling.speed',
   whatsapp: 'Soon',
-  ratingEndpoint: '',
+  ratingEndpoint: 'https://formsubmit.co/ajax/visiongrid.pro@gmail.com',
 };
 
 const projects = [
-{
+  {
     title: 'Video 01',
     type: 'Short-form film',
     youtube: 'https://youtube.com/shorts/iexj7cn7JKU?feature=share',
@@ -436,37 +506,212 @@ starButtons.forEach((button) => {
 
 ratingForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+
+  const nameInput = document.querySelector('#rating-name');
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    ratingMessage.textContent = 'Please enter your name.';
+    nameInput.focus();
+    return;
+  }
+
   if (!selectedRating) {
     ratingMessage.textContent = 'Please choose a star rating first.';
     return;
   }
 
-  const feedback = {
-    rating: selectedRating,
-    note: document.querySelector('#rating-note').value.trim(),
-    submittedAt: new Date().toISOString(),
-  };
+  const submitButton = ratingForm.querySelector('.rating-submit');
+  submitButton.disabled = true;
+  ratingMessage.textContent = 'Sending…';
 
-  if (site.ratingEndpoint) {
-    try {
-      const response = await fetch(site.ratingEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(feedback),
-      });
-      if (!response.ok) throw new Error('Rating service unavailable');
-      ratingMessage.textContent = 'Thank you — your rating has been sent.';
-    } catch {
-      ratingMessage.textContent = 'Could not send it right now. Please try again soon.';
-      return;
+  try {
+    const response = await fetch(site.ratingEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        rating: `${selectedRating}/5`,
+        _subject: `New portfolio rating — ${selectedRating}/5`,
+        _captcha: 'true',
+      }),
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.success === false) {
+      throw new Error('Rating service unavailable');
     }
-  } else {
-    localStorage.setItem('portfolio-rating', JSON.stringify(feedback));
-    ratingMessage.textContent = 'Thank you for your rating!';
+
+    ratingMessage.textContent = 'Thank you — your rating has been sent!';
+    nameInput.value = '';
+    selectedRating = 0;
+    paintStars();
+  } catch (error) {
+    ratingMessage.textContent = 'Could not send it right now. Please try again.';
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
+
+/* --- Live anime-inspired background: sakura + ink waves + speed lines --- */
+(() => {
+  const canvas = document.querySelector('#anime-bg');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+
+  let w = 0, h = 0, dpr = 1, raf = 0;
+  let petals = [], sparks = [], clouds = [];
+
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const petalCount = Math.min(95, Math.max(38, Math.round(w * h / 19000)));
+    petals = Array.from({ length: petalCount }, () => ({
+      x: rand(-80, w + 80), y: rand(-h, h),
+      s: rand(4, 10), rot: rand(0, Math.PI * 2),
+      vx: rand(-.35, .45), vy: rand(.35, 1.15),
+      spin: rand(-.025, .025), wobble: rand(0, Math.PI * 2)
+    }));
+
+    sparks = Array.from({ length: Math.min(80, Math.round(w / 15)) }, () => ({
+      x: rand(0, w), y: rand(0, h), r: rand(.5, 1.7), phase: rand(0, 7)
+    }));
+
+    clouds = Array.from({ length: 6 }, (_, i) => ({
+      x: rand(-w * .2, w), y: rand(40, h * .9),
+      rx: rand(130, 320), ry: rand(35, 95),
+      speed: rand(.06, .18) * (i % 2 ? 1 : -1),
+      phase: rand(0, 7)
+    }));
   }
 
-  ratingForm.querySelector('#rating-note').value = '';
-});
+  function petal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(p.s * .9, -p.s * .8, p.s * 1.7, p.s * .4, 0, p.s * 1.5);
+    ctx.bezierCurveTo(-p.s * .8, p.s * .7, -p.s * .7, p.s * .15, 0, 0);
+    ctx.fillStyle = 'rgba(184, 77, 126, .25)';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawInkWave(t) {
+    ctx.save();
+    ctx.globalAlpha = .10;
+    ctx.lineWidth = 1.2;
+    for (let band = 0; band < 5; band++) {
+      ctx.beginPath();
+      const y0 = h * (.18 + band * .19);
+      for (let x = -30; x <= w + 30; x += 18) {
+        const y = y0
+          + Math.sin(x * .009 + t * .00045 + band) * (18 + band * 5)
+          + Math.sin(x * .0027 - t * .0002) * 13;
+        x === -30 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = band % 2 ? '#3948a6' : '#9b4b75';
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawSpeedLines(t) {
+    ctx.save();
+    ctx.globalAlpha = .075;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 15; i++) {
+      const y = ((i * 97 + t * .025) % (h + 180)) - 90;
+      const len = 80 + (i % 4) * 60;
+      const x = ((i * 173 + t * .018) % (w + len)) - len;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + len, y - 28);
+      ctx.strokeStyle = i % 3 === 0 ? '#9b4b75' : '#3948a6';
+      ctx.lineWidth = i % 4 === 0 ? 2 : 1;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawClouds(t) {
+    ctx.save();
+    for (const c of clouds) {
+      const x = c.x + Math.sin(t * .00012 + c.phase) * 28;
+      const y = c.y + Math.cos(t * .00016 + c.phase) * 10;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, c.rx);
+      g.addColorStop(0, 'rgba(221,220,250,.24)');
+      g.addColorStop(.55, 'rgba(221,220,250,.10)');
+      g.addColorStop(1, 'rgba(221,220,250,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(x, y, c.rx, c.ry, -.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawSparks(t) {
+    ctx.save();
+    for (const s of sparks) {
+      const alpha = .08 + .08 * Math.sin(t * .0015 + s.phase);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#3948a6';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function frame(t) {
+    ctx.clearRect(0, 0, w, h);
+
+    const bg = ctx.createLinearGradient(0, 0, w, h);
+    bg.addColorStop(0, '#f8f5ef');
+    bg.addColorStop(.48, '#f2f0f7');
+    bg.addColorStop(1, '#eef4f0');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+
+    drawClouds(t);
+    drawInkWave(t);
+    drawSpeedLines(t);
+    drawSparks(t);
+
+    for (const p of petals) {
+      p.x += p.vx + Math.sin(t * .001 + p.wobble) * .12;
+      p.y += p.vy;
+      p.rot += p.spin;
+      if (p.y > h + 30) { p.y = -30; p.x = rand(-50, w + 50); }
+      if (p.x < -60) p.x = w + 50;
+      if (p.x > w + 60) p.x = -50;
+      petal(p);
+    }
+
+    raf = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+  raf = requestAnimationFrame(frame);
+})();
 
 </script>
   </body>
