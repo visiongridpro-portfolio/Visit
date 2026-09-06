@@ -131,6 +131,50 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
 }
 .rating-form input[type="text"]::placeholder { color: #82908b; }
 .rating-form input[type="text"]:focus { border-color: var(--accent); }
+.rating-list-wrap { max-width: 500px; margin-top: 28px; }
+.rating-list-title {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font: 10px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.rating-list { display: grid; gap: 8px; }
+.rating-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-top: 1px solid rgba(29, 38, 48, .12);
+}
+.rating-entry-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+.rating-entry-stars {
+  flex: 0 0 auto;
+  color: #e1a537;
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+.rating-form input[type="text"] {
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(29, 38, 48, .25);
+  outline: 0;
+  color: var(--ink);
+  background: transparent;
+  font: 15px/1.45 var(--sans);
+}
+.rating-form input[type="text"]::placeholder { color: #82908b; }
+.rating-form input[type="text"]:focus { border-color: var(--accent); }
 .stars { display: flex; gap: 7px; margin-bottom: 18px; }
 .star-button { padding: 0; border: 0; color: #b6c6c1; background: transparent; cursor: pointer; font-size: clamp(31px, 3.4vw, 43px); line-height: 1; transition: color .18s ease, transform .18s ease; }
 .star-button:hover, .star-button:focus-visible, .star-button.is-selected { color: #e1a537; }
@@ -310,6 +354,11 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
             <p class="rating-message" id="rating-message" role="status" aria-live="polite"></p>
           </div>
         </form>
+
+        <div class="rating-list-wrap" aria-live="polite">
+          <p class="rating-list-title">Recent ratings</p>
+          <div class="rating-list" id="rating-list"></div>
+        </div>
       </section>
 
       <section class="contact section-shell reveal" id="contact">
@@ -359,7 +408,7 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
   1. Replace Your Name, role, email, Instagram and WhatsApp details below.
   2. Paste the full YouTube URL (unlisted URLs work) or just its video ID in `youtube`.
   3. Change project titles / descriptions as needed.
-  4. Ratings are sent by FormSubmit to the email in `ratingEndpoint` (first submission requires email activation).
+  4. Ratings are saved in the visitor's browser and displayed as name + stars below the form.
 */
 const site = {
   name: 'Buffling Speed (Chetan)',
@@ -367,7 +416,7 @@ const site = {
   email: 'visiongrid.pro@gmail.com',
   instagram: '@baffling.speed',
   whatsapp: 'Soon',
-  ratingEndpoint: 'https://formsubmit.co/ajax/visiongrid.pro@gmail.com',
+  ratingEndpoint: '',
 };
 
 const projects = [
@@ -504,15 +553,48 @@ starButtons.forEach((button) => {
   });
 });
 
-ratingForm.addEventListener('submit', async (event) => {
+const ratingList = document.querySelector('#rating-list');
+const ratingNameInput = document.querySelector('#rating-name');
+const ratingStorageKey = 'portfolio-ratings';
+
+const loadRatings = () => {
+  try {
+    return JSON.parse(localStorage.getItem(ratingStorageKey) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const renderRatings = () => {
+  const ratings = loadRatings();
+  ratingList.innerHTML = '';
+
+  ratings.slice().reverse().forEach((item) => {
+    const entry = document.createElement('div');
+    entry.className = 'rating-entry';
+
+    const name = document.createElement('span');
+    name.className = 'rating-entry-name';
+    name.textContent = item.name;
+
+    const stars = document.createElement('span');
+    stars.className = 'rating-entry-stars';
+    stars.setAttribute('aria-label', `${item.rating} out of 5 stars`);
+    stars.textContent = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
+
+    entry.append(name, stars);
+    ratingList.appendChild(entry);
+  });
+};
+
+ratingForm.addEventListener('submit', (event) => {
   event.preventDefault();
 
-  const nameInput = document.querySelector('#rating-name');
-  const name = nameInput.value.trim();
+  const name = ratingNameInput.value.trim();
 
   if (!name) {
     ratingMessage.textContent = 'Please enter your name.';
-    nameInput.focus();
+    ratingNameInput.focus();
     return;
   }
 
@@ -521,42 +603,24 @@ ratingForm.addEventListener('submit', async (event) => {
     return;
   }
 
-  const submitButton = ratingForm.querySelector('.rating-submit');
-  submitButton.disabled = true;
-  ratingMessage.textContent = 'Sending…';
+  const ratings = loadRatings();
+  ratings.push({
+    name,
+    rating: selectedRating,
+    submittedAt: new Date().toISOString(),
+  });
 
-  try {
-    const response = await fetch(site.ratingEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        rating: `${selectedRating}/5`,
-        _subject: `New portfolio rating — ${selectedRating}/5`,
-        _captcha: 'false',
-        _url: 'https://visiongridpro-portfolio.github.io/',
-      }),
-    });
+  // Keep the browser-side list small.
+  localStorage.setItem(ratingStorageKey, JSON.stringify(ratings.slice(-20)));
 
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok || result.success === false) {
-      console.error('FormSubmit error:', response.status, result);
-      throw new Error(result.message || 'Rating service unavailable');
-    }
-
-    ratingMessage.textContent = 'Thank you — your rating has been sent!';
-    nameInput.value = '';
-    selectedRating = 0;
-    paintStars();
-  } catch (error) {
-    ratingMessage.textContent = 'Could not send it right now. Please try again.';
-  } finally {
-    submitButton.disabled = false;
-  }
+  ratingMessage.textContent = 'Thank you for your rating!';
+  ratingNameInput.value = '';
+  selectedRating = 0;
+  paintStars();
+  renderRatings();
 });
+
+renderRatings();
 
 
 /* --- Live anime-inspired background: sakura + ink waves + speed lines --- */
