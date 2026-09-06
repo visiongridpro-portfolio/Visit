@@ -536,13 +536,15 @@ ratingForm.addEventListener('submit', async (event) => {
         name,
         rating: `${selectedRating}/5`,
         _subject: `New portfolio rating — ${selectedRating}/5`,
-        _captcha: 'true',
+        _captcha: 'false',
+        _url: 'https://visiongridpro-portfolio.github.io/',
       }),
     });
 
     const result = await response.json().catch(() => ({}));
     if (!response.ok || result.success === false) {
-      throw new Error('Rating service unavailable');
+      console.error('FormSubmit error:', response.status, result);
+      throw new Error(result.message || 'Rating service unavailable');
     }
 
     ratingMessage.textContent = 'Thank you — your rating has been sent!';
