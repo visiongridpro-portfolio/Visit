@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="A video-first portfolio." />
     <title>Your Name — Video Portfolio</title>
-    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
-    <link rel="preconnect" href="https://i.ytimg.com" />
+    <script src="https://fast.wistia.com/player.js" async></script>
+    <script src="https://fast.wistia.com/player.js" async></script>
+    <script src="https://fast.wistia.com/embed/efc2e5zqe5.js" async type="module"></script>
+    <script src="https://fast.wistia.com/embed/5d3ch2ub0j.js" async type="module"></script>
+    <script src="https://fast.wistia.com/embed/33ov8kctd4.js" async type="module"></script>
+    <style>wistia-player[media-id='efc2e5zqe5']:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/efc2e5zqe5/swatch'); display: block; filter: blur(5px); }</style>
     <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -96,7 +100,7 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
 .section-note { margin: 0; color: var(--muted); font: 11px var(--mono); }
 
 .video-frame { position: relative; overflow: hidden; aspect-ratio: 9 / 16; background: #20252c; border-radius: 3px; box-shadow: 0 25px 44px rgba(41, 37, 84, .18); }
-.video-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.video-frame wistia-player { display: block; width: 100%; height: 100%; }
 .video-placeholder { height: 100%; padding: 18px; display: flex; flex-direction: column; justify-content: end; color: rgba(255,255,255,.88); background: radial-gradient(circle at 70% 20%, #9295cc 0, transparent 38%), linear-gradient(145deg, #2e3442, #171b22); }
 .video-placeholder::before { content: ''; position: absolute; width: 48px; height: 48px; top: 50%; left: 50%; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; transform: translate(-50%, -50%); }
 .video-placeholder::after { content: ''; position: absolute; top: 50%; left: 50%; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 9px solid white; transform: translate(-35%, -50%); }
@@ -335,12 +339,12 @@ h2 { margin: 8px 0 0; font-size: clamp(34px, 4vw, 58px); font-weight: 600; lette
 /*
   QUICK UPDATE GUIDE
   1. Replace Your Name, role, email, Instagram and WhatsApp details below.
-  2. Paste the full YouTube URL (unlisted URLs work) or just its video ID in `youtube`.
+  2. Paste the full YouTube URL (unlisted URLs work) or just its video ID in `Wistia media ID in `wistia`.
   3. Change project titles / descriptions as needed.
   4. To collect ratings from every visitor, add your form-service endpoint to `ratingEndpoint`.
 */
 const site = {
-  name: 'Baffling Speed (Chetan)',
+  name: 'Buffling Speed (Chetan)',
   role: 'Video editor & visual storyteller',
   email: 'visiongrid.pro@gmail.com',
   instagram: '@baffling.speed',
@@ -349,18 +353,66 @@ const site = {
 };
 
 const projects = [
-  { title: 'Video 01', type: 'Short-form film', youtube: 'https://youtube.com/shorts/Y1UpkXrV1CA?feature=share' },
-  { title: 'Video 02', type: 'Short-form film', youtube: 'https://youtube.com/shorts/iexj7cn7JKU?feature=share' },
-  { title: 'Video 03', type: 'Short-form film', youtube: 'https://youtube.com/shorts/4pOXjAnKeYI?feature=share' },
-  { title: 'Video 04', type: 'Short-form film', youtube: 'https://youtube.com/shorts/GTPcxI39aWg?feature=share' },
-  { title: 'Video 05', type: 'Short-form film', youtube: 'https://youtube.com/shorts/5SSZikLi3BE?feature=share' },
-  { title: 'Video 06', type: 'Short-form film', youtube: 'https://youtube.com/shorts/9WVambaotTU?feature=share' },
-  { title: 'Video 07', type: 'Short-form film', youtube: 'https://youtube.com/shorts/3f68WGkMlEI?feature=share' },
-  { title: 'Video 08', type: 'Short-form film', youtube: 'https://youtube.com/shorts/gtUtih0e9HI?feature=share' },
-  { title: 'Video 09', type: 'Short-form film', youtube: 'https://youtube.com/shorts/L8lJ0l1kmBA?feature=share' },
-  { title: 'Video 10', type: 'Short-form film', youtube: 'https://youtube.com/shorts/lJ6QsfuK3Uk?feature=share' },
-  { title: 'Video 11', type: 'Short-form film', youtube: 'https://youtube.com/shorts/Zvvc_ejTGIo?feature=share' },
-  { title: 'Video 12', type: 'Short-form film', youtube: 'https://youtube.com/shorts/ZB4-b1aDfk4?feature=share' },
+  {
+    title: 'Video 01',
+    type: 'Short-form film',
+    wistia: 'efc2e5zqe5',
+  },
+  {
+    title: 'Video 02',
+    type: 'Short-form film',
+    wistia: 'nhnk7spbte',
+  },
+  {
+    title: 'Video 03',
+    type: 'Short-form film',
+    wistia: 'gi9pqap8lh',
+  },
+  {
+    title: 'Video 04',
+    type: 'Short-form film',
+    wistia: 'cf7etqz6lo',
+  },
+  {
+    title: 'Video 05',
+    type: 'Short-form film',
+    wistia: 'zzjrhednwo',
+  },
+  {
+    title: 'Video 06',
+    type: 'Short-form film',
+    wistia: 'ezne8venz4',
+  },
+  {
+    title: 'Video 07',
+    type: 'Short-form film',
+    wistia: 'j71n7tt5bi',
+  },
+  {
+    title: 'Video 08',
+    type: 'Short-form film',
+    wistia: '9fqmh694pd',
+  },
+  {
+    title: 'Video 09',
+    type: 'Short-form film',
+    wistia: 'p3yo7rprb3',
+  },
+  {
+    title: 'Video 10',
+    type: 'Short-form film',
+    wistia: 'i585blqrr1',
+  },
+  {
+    title: 'Video 11',
+    type: 'Short-form film',
+    wistia: '5d3ch2ub0j',
+  },
+  {
+    title: 'Video 12',
+    type: 'Short-form film',
+    wistia: '33ov8kctd4',
+  },
 ];
 
 const youTubeId = (value) => {
@@ -380,8 +432,8 @@ const makeCard = (project, index) => {
   card.querySelector('.card-meta p').textContent = project.type;
   card.querySelector('.card-number').textContent = number;
 
-  if (id) {
-    frame.innerHTML = `<iframe title="${project.title}" src="https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+  if (project.wistia) {
+    frame.innerHTML = `<wistia-player media-id="${project.wistia}" aspect="0.5625"></wistia-player>`;
   } else {
     card.querySelector('.placeholder-number').textContent = number;
   }
